@@ -84,6 +84,7 @@
   </div>
  </details>
  <div class="filter-row"><span id="image-total"></span><button id="image-trash-toggle" class="button secondary" type="button" aria-pressed="false" data-dashboard-admin hidden>Thùng rác</button><select id="image-device" aria-label="Lọc camera" data-local-only><option value="">Tất cả trạm</option><option>station-001</option><option>station-002</option></select></div>
+ <div id="image-select-controls" hidden><button id="image-select-toggle" class="button secondary" type="button" aria-pressed="false">Chọn ảnh</button><div id="image-selection-bar" hidden><label class="check-row"><input id="image-select-page" type="checkbox"> Chọn tất cả trên trang này</label><span id="image-selected-count" role="status" aria-live="polite">Đã chọn 0 ảnh</span><button id="image-delete-selected" class="button image-delete" type="button" disabled>Xóa ảnh đã chọn</button><button id="image-clear-selected" class="button secondary" type="button" disabled>Bỏ chọn tất cả</button></div></div>
  <p id="image-trash-note" class="info-box" hidden>Chọn ảnh để khôi phục vào thư viện.</p>
  <div id="image-grid" class="image-grid"></div><div class="pagination"><button class="button secondary" id="image-prev">← Trước</button><span id="image-page"></span><button class="button secondary" id="image-next">Tiếp →</button></div>
 </section>
@@ -117,6 +118,7 @@
 <footer><span><svg><use href="#leaf"/></svg> PTIT Garden <span class="footer-divider">/</span> IoT & giám sát sâu bệnh</span><span><span id="data-source">Dữ liệu mô phỏng</span> · <span id="last-update">Đang kết nối…</span></span></footer>
 </main></div>
 <dialog id="image-dialog"><button class="dialog-close" aria-label="Đóng">×</button><div id="image-detail"></div></dialog>
+<dialog id="image-delete-dialog" aria-labelledby="image-delete-heading"><h2 id="image-delete-heading">Xóa ảnh đã chọn?</h2><p id="image-delete-summary"></p><p>Bạn có thể khôi phục các ảnh này trong Thùng rác.</p><div class="actions"><button id="image-delete-confirm" class="button image-delete" type="button">Chuyển vào Thùng rác</button><button id="image-delete-cancel" class="button secondary" type="button">Giữ lại ảnh</button></div><p id="image-delete-progress" role="status" aria-live="polite"></p></dialog>
 <dialog id="device-dialog"><button class="dialog-close" aria-label="Đóng">×</button><h2>Chỉnh sửa trạm</h2><form id="device-form"><input name="id" type="hidden"><label>Tên trạm<input name="name" maxlength="80" required></label><label>Vĩ độ<input name="latitude" type="number" step="any" min="-90" max="90" required></label><label>Kinh độ<input name="longitude" type="number" step="any" min="-180" max="180" required></label><label class="check-row"><input name="enabled" type="checkbox"> Cho phép nhận dữ liệu</label><button class="button full">Lưu thay đổi</button></form></dialog>
 <dialog id="notifications-dialog"><button class="dialog-close" aria-label="Đóng">×</button><h2>Hộp thư khu vườn</h2><p>Thông báo cục bộ từ các luật cảnh báo</p><button class="button secondary" id="read-all" data-dashboard-admin>Đánh dấu đã đọc</button><div id="notification-list"></div></dialog>
 <div id="toast" role="status" hidden></div>

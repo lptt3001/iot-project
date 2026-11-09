@@ -254,7 +254,57 @@ function imagePreview(row){
  return `<div class="image-preview"><img src="${mediaPath(row.id,Boolean(row.deleted_at))}" alt="${row.source==='hardware'?'Ảnh camera':'Ảnh'} của ${esc(row.device_id)}" loading="lazy"><svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${detections.map(d=>`<rect class="ai-box" data-class="${esc(d.pest_code)}" x="${d.x_min*width}" y="${d.y_min*height}" width="${(d.x_max-d.x_min)*width}" height="${(d.y_max-d.y_min)*height}" fill="none"/>`).join('')}</svg></div>`;
 }
 
-let imageLoadVersion=0;
+let imageLoadVersion=0,imageSelectionMode=false,imageDeleteBusy=false;
+const selectedImageIds=new Set();
+function updateImageSelection(){
+ const allowed=cloudMode&&canManageDashboard()&&!state.imageTrash;
+ $('#image-select-controls').hidden=!allowed;
+ $('#image-select-controls').classList.toggle('image-selection-active',imageSelectionMode&&allowed);
+ $('#image-selection-bar').hidden=!imageSelectionMode||!allowed;
+ $('#image-select-toggle').textContent=imageSelectionMode?'Xong':'Chọn ảnh';
+ $('#image-select-toggle').setAttribute('aria-pressed',String(imageSelectionMode));
+ $('#image-select-toggle').disabled=imageDeleteBusy||!state.imageTotal;
+ $('#image-selected-count').textContent=`Đã chọn ${selectedImageIds.size} ảnh`;
+ for(const id of ['image-delete-selected','image-clear-selected'])$('#'+id).disabled=imageDeleteBusy||!selectedImageIds.size;
+ const page=$('#image-select-page'),count=state.images.filter(r=>selectedImageIds.has(r.id)).length;
+ page.checked=Boolean(state.images.length)&&count===state.images.length;
+ page.indeterminate=count>0&&count<state.images.length;page.disabled=imageDeleteBusy||!state.images.length;
+ $('#image-grid').classList.toggle('selecting-images',imageSelectionMode&&allowed);
+ for(const card of $$('#image-grid .image-card')){
+  const selected=selectedImageIds.has(card.dataset.id);
+  card.classList.toggle('image-selected',imageSelectionMode&&selected);
+  if(imageSelectionMode&&allowed)card.setAttribute('aria-pressed',String(selected));else card.removeAttribute('aria-pressed');
+  card.disabled=imageDeleteBusy;
+ }
+}
+function toggleSelectedImage(id){
+ if(imageDeleteBusy)return;
+ if(selectedImageIds.has(id))selectedImageIds.delete(id);else selectedImageIds.add(id);
+ updateImageSelection();
+}
+async function deleteSelectedImages(){
+ if(imageDeleteBusy||!selectedImageIds.size||!cloudMode||!canManageDashboard())return;
+ const ids=[...selectedImageIds];let deleted=0;
+ imageDeleteBusy=true;updateImageSelection();
+ $('#image-delete-confirm').disabled=$('#image-delete-cancel').disabled=true;
+ try{
+  for(const id of ids){
+   $('#image-delete-progress').textContent=`Đang chuyển ảnh vào Thùng rác (${deleted}/${ids.length})…`;
+   await api(`/api/images/${encodeURIComponent(id)}`,{method:'DELETE',signal:AbortSignal.timeout(15000)});
+   selectedImageIds.delete(id);deleted++;
+   if(activeAiJob?.panel===$('#image-detail')&&$('#image-dialog').open)activeAiJob.cancel();
+   if($('#capture-result').dataset.imageId===id){$('#capture-result').hidden=true;$('#capture-status').textContent='Ảnh vừa chụp đã chuyển vào Thùng rác.';}
+  }
+  imageSelectionMode=false;
+  toast(`Đã chuyển ${deleted} ảnh vào Thùng rác.`);
+ }catch(error){toast(`Đã chuyển ${deleted}/${ids.length} ảnh. ${error.message} Các ảnh còn lại vẫn được chọn.`,true);}
+ finally{
+  imageDeleteBusy=false;$('#image-delete-dialog').close();
+  $('#image-delete-confirm').disabled=$('#image-delete-cancel').disabled=false;
+  state.imageKey=null;updateImageSelection();
+  await loadImages();
+ }
+}
 async function loadImages(){
  const version=++imageLoadVersion, device=$('#image-device').value;
  const trashed=Boolean(state.imageTrash);
@@ -275,6 +325,7 @@ async function loadImages(){
   $('#image-grid').innerHTML=result.rows.map(row=>`<button class="image-card" data-id="${esc(row.id)}">${imagePreview(row)}<div class="image-info"><h3>${esc(row.device_id)}<span class="tag">${row.source==='simulation'?'Mô phỏng':row.source==='hardware'?'Camera thật':'Ảnh tải lên'}</span></h3><p>${cloudMode?'Nhận lúc ':''}${date(row.captured_at||row.received_at)}</p>${cloudMode?`<p class="image-origin">${esc(imageAttribution(row))}</p>`:''}<p>${row.deleted_at?'Đã xóa · Mở để khôi phục':row.status==='succeeded'?`${row.pest_count} côn trùng · Đã lưu kết quả AI`:cloudMode?(['queued','running'].includes(row.status)?'Chờ AI tự động phân tích':row.status==='failed'?'AI tự động chưa thành công · Có thể thử trên web':'Mở ảnh để phân tích thử'):row.status==='failed'?'Chưa có model thật':'Đang xử lý…'}</p></div></button>`).join('')||`<div class="empty">${cloudMode?'Thư viện chưa có ảnh. Bạn có thể tải ảnh lên hoặc chụp ảnh mới.':'Chưa có ảnh. Bấm “Chụp mô phỏng” để bắt đầu.'}</div>`;
  }
  if(!result.rows.length&&trashed)$('#image-grid').innerHTML='<div class="empty">Thùng rác trống.</div>';
+ updateImageSelection();
  if(cloudMode&&canManageDashboard()&&!trashed)setTimeout(()=>runBrowserAssist(),0);
  let latest=result.rows[0];if(trashed||state.imageOffset||device){const first=await api('/api/images?limit=1');latest=first.rows[0];}
  if(version!==imageLoadVersion)return;
@@ -348,6 +399,7 @@ async function changeImageTrash(row,trashed){
 }
 
 function setImageTrashView(trashed){
+ imageSelectionMode=false;selectedImageIds.clear();
  state.imageTrash=trashed;state.imageOffset=0;state.imageKey=null;
  state.images=[];imageLoadVersion++;
  $('#image-grid').innerHTML='<div class="empty" role="status">Đang tải ảnh…</div>';
@@ -355,6 +407,7 @@ function setImageTrashView(trashed){
  button.textContent=trashed?'Về thư viện':'Thùng rác';
  button.setAttribute('aria-pressed',String(trashed));
  $('#image-trash-note').hidden=!trashed;
+ updateImageSelection();
 }
 
 let aiWorker, activeAiJob, aiRequestId=0;
@@ -1034,7 +1087,7 @@ $('#chart-tabs').addEventListener('click',e=>{const b=e.target.closest('[data-me
 $('#history-device').addEventListener('change',()=>loadHistory().catch(e=>toast(e.message,true)));
 $$('.export').forEach(b=>b.addEventListener('click',()=>{const device=state.page==='devices'?$('#history-device').value:'';window.location.assign(`/api/export.csv?hours=${state.hours}${device?'&device='+encodeURIComponent(device):''}`);toast(cloudMode?'Đang tải dữ liệu CSV…':'Đang tải dữ liệu CSV…');}));
 $('#alert-tabs').addEventListener('click',e=>{const b=e.target.closest('[data-state]');if(!b)return;state.alertState=b.dataset.state;state.alertOffset=0;$$('#alert-tabs button').forEach(el=>el.classList.toggle('selected',el===b));loadAlerts().catch(e=>toast(e.message,true));});
-document.addEventListener('click',e=>{const ack=e.target.closest('.ack-alert');if(ack)action(ack,async()=>{await api(`/api/alerts/${ack.dataset.id}/ack`,{method:'POST'});await loadAlerts();await refresh();toast('Đã xác nhận cảnh báo.');});const image=e.target.closest('.image-card');if(image)action(null,()=>openImage(image.dataset.id));const edit=e.target.closest('.edit-device');if(edit){const d=state.data.devices.find(d=>d.id===edit.dataset.id),f=$('#device-form');for(const k of ['id','name','latitude','longitude'])f.elements[k].value=d[k];f.elements.enabled.checked=d.enabled;$('#device-dialog').showModal();}});
+document.addEventListener('click',e=>{const ack=e.target.closest('.ack-alert');if(ack)action(ack,async()=>{await api(`/api/alerts/${ack.dataset.id}/ack`,{method:'POST'});await loadAlerts();await refresh();toast('Đã xác nhận cảnh báo.');});const image=e.target.closest('.image-card');if(image){if(imageSelectionMode&&cloudMode&&canManageDashboard()&&!state.imageTrash)toggleSelectedImage(image.dataset.id);else action(null,()=>openImage(image.dataset.id));}const edit=e.target.closest('.edit-device');if(edit){const d=state.data.devices.find(d=>d.id===edit.dataset.id),f=$('#device-form');for(const k of ['id','name','latitude','longitude'])f.elements[k].value=d[k];f.elements.enabled.checked=d.enabled;$('#device-dialog').showModal();}});
 $('#overview-camera').addEventListener('click',()=>{if($('#overview-camera').dataset.id)action(null,()=>openImage($('#overview-camera').dataset.id));});
 if(cloudMode)$('#overview-camera').addEventListener('keydown',event=>{
  if(event.key==='Enter'||event.key===' '){event.preventDefault();event.currentTarget.click();}
@@ -1056,6 +1109,24 @@ if(cloudMode){
   if(activeAiJob?.panel===$('#image-detail'))activeAiJob.cancel();
  });
 }
+$('#image-select-toggle').addEventListener('click',()=>{
+ if(imageDeleteBusy)return;
+ imageSelectionMode=!imageSelectionMode;if(!imageSelectionMode)selectedImageIds.clear();updateImageSelection();
+});
+$('#image-select-page').addEventListener('change',event=>{
+ if(imageDeleteBusy)return;
+ for(const row of state.images){if(event.target.checked)selectedImageIds.add(row.id);else selectedImageIds.delete(row.id);}
+ updateImageSelection();
+});
+$('#image-clear-selected').addEventListener('click',()=>{if(!imageDeleteBusy){selectedImageIds.clear();updateImageSelection();}});
+$('#image-delete-selected').addEventListener('click',()=>{
+ if(!selectedImageIds.size||imageDeleteBusy)return;
+ $('#image-delete-summary').textContent=`Chuyển ${selectedImageIds.size} ảnh đã chọn vào Thùng rác?`;
+ $('#image-delete-progress').textContent='';$('#image-delete-dialog').showModal();$('#image-delete-cancel').focus();
+});
+$('#image-delete-cancel').addEventListener('click',()=>$('#image-delete-dialog').close());
+$('#image-delete-confirm').addEventListener('click',()=>action(null,deleteSelectedImages));
+$('#image-delete-dialog').addEventListener('cancel',event=>{if(imageDeleteBusy)event.preventDefault();});
 for(const [id,delta] of [['image-prev',-12],['image-next',12]])$('#'+id).addEventListener('click',()=>{state.imageOffset=Math.max(0,state.imageOffset+delta);loadImages().catch(e=>toast(e.message,true));});
 for(const [id,delta] of [['alert-prev',-20],['alert-next',20]])$('#'+id).addEventListener('click',()=>{state.alertOffset=Math.max(0,state.alertOffset+delta);loadAlerts().catch(e=>toast(e.message,true));});
 $('#image-device').addEventListener('change',()=>{state.imageOffset=0;loadImages().catch(e=>toast(e.message,true));});
