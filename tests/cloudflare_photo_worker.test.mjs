@@ -67,6 +67,24 @@ test('Worker derives photo actors from the session, distinguishes automatic capt
   assert.equal((await f.request('/api/images',{headers:member})).status,200);
   assert.equal((await f.request('/api/images/upload',{method:'POST',headers:{...member,'Content-Type':'image/jpeg'},body:jpeg})).status,403);
   assert.equal((await f.request('/api/camera/requests',{method:'POST',headers:member})).status,403);
+  assert.equal((await f.request(`/api/images/${automatic}/analysis/claim`,{method:'POST',headers:member})).status,403);
+ }finally{f.sql.close();}
+});
+
+test('Worker persists browser AI only through authenticated admin leases and bounded same-origin JSON',async()=>{
+ const f=fixture();try{
+  const headers=await login(f),id=crypto.randomUUID();
+  f.env.APP_ORIGIN='https://garden.test';f.env.ASSETS={fetch:async()=>Response.json({model_version:'current-p2'})};
+  const image=Uint8Array.from([255,216,255,192,0,17,8,1,224,2,128,3,1,17,0,2,17,0,3,17,0,255,217]);
+  await f.request('/device/v1/station-001/images/'+id,{method:'PUT',headers:{...device,'Content-Type':'image/jpeg'},body:image});
+  const path=`/api/images/${id}/analysis/`;
+  assert.equal((await f.request(path+'claim',{method:'POST'})).status,401);
+  assert.equal((await f.request(path+'claim',{method:'POST',headers:{...headers,Origin:'https://untrusted.test'}})).status,403);
+  const response=await f.request(path+'claim',{method:'POST',headers});assert.equal(response.status,200,await response.clone().text());
+  const claim=await response.json();
+  const saved=await f.request(path+'complete',{method:'POST',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({lease_token:claim.lease_token,result:{width:640,height:480,model_version:'current-p2',detections:[]}})});
+  assert.equal(saved.status,200,await saved.clone().text());assert.equal((await saved.json()).saved,true);
+  const gallery=await (await f.request('/api/images?id='+id,{headers})).json();assert.equal(gallery.rows[0].status,'succeeded');
  }finally{f.sql.close();}
 });
 

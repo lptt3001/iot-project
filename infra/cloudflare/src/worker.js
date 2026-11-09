@@ -18,6 +18,7 @@ import { LedControlError, ledStatus, setLed, ledCommand, confirmLed } from "./le
 import { setImageTrashed, cameraImageInsert, uploadedImageInsert } from "./image-library.js";
 import { StationStartupError, recordStationStartup, pruneStationStartups } from "./station-startups.js";
 import { scheduleMorningCapture, automationStatus, analysisCapability, analysisPage, runAutomaticAnalysis } from './automation.js';
+import {PhotoAnalysisError,claimPhotoAnalysis,completePhotoAnalysis,failPhotoAnalysis} from './photo-analysis.js';
 import {evaluatePlantHealth,plantHealthStatus} from './plant-health.js';
 import {ObservationRuleError,observationConfig,updateObservationRule,setObservationCrop} from './observation-alerts.js';
 import {
@@ -372,6 +373,7 @@ async function handle(request, env, ctx) {
   const listRegistrations = pathname === REGISTRATIONS_PATH;
   const createCapture = pathname === CAMERA_REQUESTS_PATH;
   const uploadImage = pathname === "/api/images/upload";
+  const photoAnalysis=/^\/api\/images\/([a-f0-9-]{36})\/analysis\/(claim|complete|fail)$/i.exec(pathname);
   const pairingCollection = pathname === "/api/telegram/pairing";
   const recipientCollection=pathname==='/api/telegram/recipients';
   const recipientAction=/^\/api\/telegram\/recipients\/([a-f0-9]{32})(\/(?:test|demo-test))?$/i.exec(pathname);
@@ -391,7 +393,7 @@ async function handle(request, env, ctx) {
   if (led && !["GET", "PUT"].includes(request.method)) {
     throw new RequestError(405, "Method not allowed.", { Allow: "GET, PUT" });
   }
-  const method = recipientAction?(recipientAction[2]?'POST':'PUT'):pairingAction || (pairingCollection && request.method === "POST") ? "POST" : imageAction ? (imageMutation[2] ? "POST" : "DELETE") : led && request.method === "PUT" ? "PUT" : ack || readNotifications || approve || createCapture || uploadImage ? "POST" : rule ? "PUT" : "GET";
+  const method = photoAnalysis?'POST':recipientAction?(recipientAction[2]?'POST':'PUT'):pairingAction || (pairingCollection && request.method === "POST") ? "POST" : imageAction ? (imageMutation[2] ? "POST" : "DELETE") : led && request.method === "PUT" ? "PUT" : ack || readNotifications || approve || createCapture || uploadImage ? "POST" : rule ? "PUT" : "GET";
   if (!imageAction && !led && !hasMedia && !assetPath && !listRegistrations && !captureStatus && !DASHBOARD_GETS.has(pathname) && method === "GET") {
     throw new RequestError(404, "Route not found.");
   }
@@ -413,6 +415,15 @@ async function handle(request, env, ctx) {
   if (captureStatus) return json(await getCameraRequest(env.DB, captureId.toLowerCase()));
   if (method !== "GET") {
     verifyDashboardWrite(request, url);
+    if(photoAnalysis){
+      const [,,operation]=photoAnalysis,id=photoAnalysis[1].toLowerCase();
+      if(operation==='claim')return json(await claimPhotoAnalysis(env,id,Date.now(),url.searchParams.get('reanalyze')==='1'));
+      const bytes=await readBody(request,'application/json',256*1024);let body;
+      try{body=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));}catch{throw new RequestError(422,'JSON kết quả không hợp lệ.');}
+      const result=operation==='complete'?await completePhotoAnalysis(env,id,body,account):await failPhotoAnalysis(env,id,body);
+      if(operation==='complete'&&await hasTelegramRecipients(env))ctx.waitUntil(enqueueDeliveries(env.DB).then(()=>flushDeliveries(env,fetch,{limit:5})).catch(error=>console.error('Saved AI notification failed',error?.name)));
+      return json(result);
+    }
     if(recipientAction){
       const id=recipientAction[1].toLowerCase(),body=await readSmallJson(request);
       if(!recipientAction[2])return json(await updateRecipient(env,id,body,account));
@@ -493,7 +504,7 @@ export default {
     } catch (error) {
       if (error instanceof RequestError) return json({ detail: error.message }, error.status, error.headers);
       if (error instanceof DashboardAuthError) return json({ detail: error.message }, error.status, error.headers);
-      if (error instanceof ObservationRuleError || error instanceof DashboardQueryError || error instanceof DashboardAlertError || error instanceof CameraRequestError || error instanceof LedControlError || error instanceof TelegramRecipientError || error instanceof StationStartupError) {
+      if (error instanceof PhotoAnalysisError || error instanceof ObservationRuleError || error instanceof DashboardQueryError || error instanceof DashboardAlertError || error instanceof CameraRequestError || error instanceof LedControlError || error instanceof TelegramRecipientError || error instanceof StationStartupError) {
         return json({ detail: error.message }, error.status);
       }
       console.error("Cloudflare station request failed", error?.name);

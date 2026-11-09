@@ -40,7 +40,7 @@ export async function automationStatus(env) {
       WHERE i.deleted_at IS NULL ORDER BY a.created_at DESC LIMIT 1`).first(),
   ]);
   return {capture_time:'07:00',timezone:'Asia/Ho_Chi_Minh',cloud_ai:Boolean(env.BROWSER),daily,
-    pending:queue.pending,last,notice:'Trạm cần bật và có Wi-Fi lúc 07:00. Cảm biến báo mưa sẽ tạm dừng chụp. Ảnh camera mới được phân tích tự động; chỉ gửi Telegram khi gợi ý được loài sâu hại.'};
+    pending:queue.pending,last,notice:'Trạm cần bật và có Wi-Fi lúc 07:00. Cảm biến báo mưa sẽ tạm dừng chụp. Ảnh camera mới được phân tích tự động; gửi Telegram khi một nhóm côn trùng đã bật đạt ngưỡng. Khi cloud bị giới hạn, mở Camera để trình duyệt xử lý và lưu ảnh.'};
 }
 
 // Short-lived capability: grants read access only to this job's image and AI assets.
@@ -85,7 +85,7 @@ export async function inferInCloud(env,job) {
 
 export function validateResult(result) {
   if(!result||!Number.isSafeInteger(result.width)||!Number.isSafeInteger(result.height)||result.width<1||result.height<1||
-    typeof result.model_version!=='string'||result.model_version.length>120||!Array.isArray(result.detections)||result.detections.length>300)throw Error('Invalid AI result');
+    result.width*result.height>16000000||typeof result.model_version!=='string'||!result.model_version.length||result.model_version.length>120||!Array.isArray(result.detections)||result.detections.length>300)throw Error('Invalid AI result');
   for(const d of result.detections){
     if(!d||!(d.pest_code==='unknown'||Object.hasOwn(SPECIES,d.pest_code))||
       !['unknown','identified'].includes(d.identification_status)||
@@ -93,15 +93,41 @@ export function validateResult(result) {
       !['confidence','x_min','y_min','x_max','y_max'].every(k=>Number.isFinite(d[k])&&d[k]>=0&&d[k]<=1)||
       d.x_min>=d.x_max||d.y_min>=d.y_max||d.pest_code!=='unknown'&&d.confidence<.7)throw Error('Invalid AI detection');
   }
-  return {...result,total_count:result.detections.length,
+  return {width:result.width,height:result.height,model_version:result.model_version,
+    resized:Boolean(result.resized),truncated:Boolean(result.truncated),
+    detections:result.detections.map(d=>Object.fromEntries(['pest_code','identification_status','confidence','x_min','y_min','x_max','y_max'].map(k=>[k,d[k]]))),total_count:result.detections.length,
     identified_count:result.detections.filter(d=>d.pest_code!=='unknown').length,
     unknown_count:result.detections.filter(d=>d.pest_code==='unknown').length};
+}
+
+export async function persistAnalysisResult(env,job,input,source='cloud',actor=null,now=Date.now()) {
+  const result={...validateResult(input),processing_source:source,processed_by:actor},message=pestMessage(result,job.received_at,env.APP_ORIGIN);
+  const db=env.DB;
+  const [,saved]=await db.batch([
+    pestHealthAlertInsert(db,job,result,message,now),
+    db.prepare(`UPDATE image_analysis SET status='succeeded',result=?,completed_at=?,error_message=NULL,lease_token=NULL
+      WHERE image_id=? AND lease_token=? AND status='running'
+      AND EXISTS(SELECT 1 FROM images WHERE image_id=? AND deleted_at IS NULL) RETURNING image_id`)
+      .bind(JSON.stringify(result),now,job.image_id,job.lease_token,job.image_id),
+  ]);
+  if(!saved.results?.length)throw Error('Analysis lease changed');
+  return result;
+}
+
+export function analysisFailure(error,now=Date.now()) {
+  const message=String(error?.message??'');
+  if(/time limit exceeded|daily.*limit|quota/i.test(message))return {code:'quota',retry:Math.floor(now/DAY)*DAY+DAY+60000,
+    message:'AI cloud đã hết thời gian miễn phí hôm nay. Mở Camera để trình duyệt tự phân tích và lưu ảnh.'};
+  if(/429|rate limit/i.test(message))return {code:'rate_limit',retry:now+300000,
+    message:'AI cloud đang bị giới hạn lượt chạy. Mở Camera để trình duyệt tự phân tích và lưu ảnh.'};
+  return {code:/timeout|time.?out/i.test(message)?'timeout':'processing',retry:now+300000,
+    message:'AI cloud chưa hoàn tất. Mở Camera để trình duyệt tự phân tích và lưu ảnh.'};
 }
 
 export function pestMessage(result,receivedAt,origin) {
   const counts={};for(const d of result.detections)if(d.pest_code!=='unknown')counts[d.pest_code]=(counts[d.pest_code]||0)+1;
   const local=new Date(receivedAt+OFFSET).toISOString().slice(0,19).replace('T',' ');
-  return `🐛 PTIT Garden · Phát hiện nghi sâu hại\nTrạm station-001 · Ảnh nhận ${local} (UTC+7)\n`+
+  return `🐛 PTIT Garden · Côn trùng trong ảnh camera\nTrạm station-001 · Ảnh nhận ${local} (UTC+7)\n`+
     Object.entries(counts).map(([code,n])=>`${SPECIES[code]}: ${n}`).join('\n')+
     (result.unknown_count?`\nCôn trùng chưa xác định: ${result.unknown_count}`:'')+
     `\n\n${Knowledge.pestAdviceText(result.detections).slice(0,2600)}`+
@@ -127,25 +153,18 @@ export async function runAutomaticAnalysis(env,settings,infer=inferInCloud,now=D
           (SELECT received_at FROM images WHERE images.image_id=image_analysis.image_id) AS received_at`)
       .bind(token,now+LEASE,now).first();
     if(!job)return {skipped:'empty'};
-    const result=validateResult(await infer(env,job)),finished=Date.now();
-    const message=pestMessage(result,job.received_at,env.APP_ORIGIN);
-    // Persist the result and its alert together. Deleted photos never produce a new alert.
-    await db.batch([
-      pestHealthAlertInsert(db,job,result,message,finished),
-      db.prepare(`INSERT INTO pest_notifications(image_id,created_at,chat_id,text,next_attempt_at)
-        SELECT a.image_id,?, ?, ?, ? FROM image_analysis a JOIN images i USING(image_id)
-        WHERE a.image_id=? AND a.status='running' AND a.lease_token=? AND i.deleted_at IS NULL AND ?>0 AND ? IS NOT NULL
-        ON CONFLICT(image_id) DO NOTHING`).bind(finished,settings?.chatId??null,
-          message,finished,job.image_id,token,result.identified_count,settings?.chatId??null),
-      db.prepare(`UPDATE image_analysis SET status='succeeded',result=?,completed_at=?,error_message=NULL,lease_token=NULL
-        WHERE image_id=? AND lease_token=?`).bind(JSON.stringify(result),finished,job.image_id,token),
-    ]);
+    const result=await persistAnalysisResult(env,job,await infer(env,job));
+    // Retain the legacy single-recipient test/compatibility queue only when explicitly supplied.
+    if(settings?.chatId)await db.prepare(`INSERT INTO pest_notifications(image_id,created_at,chat_id,text,next_attempt_at)
+      SELECT image_id,?,?,?,? FROM image_analysis WHERE image_id=? AND status='succeeded' AND ?>0 ON CONFLICT(image_id) DO NOTHING`)
+      .bind(Date.now(),settings.chatId,pestMessage(result,job.received_at,env.APP_ORIGIN),Date.now(),job.image_id,result.identified_count).run();
     return {image_id:job.image_id,status:'succeeded',total:result.total_count,identified:result.identified_count};
   }catch(error){
-    if(job)await db.prepare(`UPDATE image_analysis SET status=CASE WHEN attempts>=3 THEN 'failed' ELSE 'queued' END,
-      lease_token=NULL,error_message='Chưa phân tích tự động được ảnh. Hệ thống sẽ thử lại hoặc bạn có thể phân tích trên web.',next_attempt_at=?
-      WHERE image_id=? AND lease_token=?`).bind(Date.now()+300000,job.image_id,token).run();
-    console.error('Automatic AI failed',error?.message?.slice(0,160));
+    const failure=analysisFailure(error);
+    if(job)await db.prepare(`UPDATE image_analysis SET status=CASE WHEN ? IN ('quota','rate_limit') THEN 'queued' WHEN attempts>=3 THEN 'failed' ELSE 'queued' END,
+      attempts=CASE WHEN ? IN ('quota','rate_limit') THEN max(0,attempts-1) ELSE attempts END,lease_token=NULL,error_message=?,next_attempt_at=?
+      WHERE image_id=? AND lease_token=?`).bind(failure.code,failure.code,failure.message,failure.retry,job.image_id,token).run();
+    console.error('Automatic AI failed',failure.code);
     return {image_id:job?.image_id,status:'retry'};
   }finally{
     await db.prepare('DELETE FROM automation_lock WHERE id=1 AND token=?').bind(token).run();

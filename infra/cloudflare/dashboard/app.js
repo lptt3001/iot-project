@@ -249,7 +249,11 @@ function imageAttribution(row){
  if(row.capture_origin==='upload'||row.source==='upload')return account?`Tải lên · tài khoản ${account}`:'Ảnh tải lên · chưa lưu tài khoản';
  return 'Ảnh cũ · chưa lưu nguồn chụp';
 }
-function imagePreview(row){return `<div class="image-preview"><img src="${mediaPath(row.id,Boolean(row.deleted_at))}" alt="${row.source==='simulation'?'Ảnh bẫy tổng hợp':row.source==='hardware'?'Ảnh camera':'Ảnh tải lên'} của ${esc(row.device_id)}" loading="lazy"><svg viewBox="0 0 960 600" aria-hidden="true">${(row.detections||[]).map(d=>`<rect x="${d.x_min*960}" y="${d.y_min*600}" width="${(d.x_max-d.x_min)*960}" height="${(d.y_max-d.y_min)*600}" stroke="#fcfce0" fill="none"/>`).join('')}</svg></div>`;}
+function imagePreview(row){
+ const detections=row.analysis?.detections||row.detections||[],width=row.analysis?.width||960,height=row.analysis?.height||600;
+ return `<div class="image-preview"><img src="${mediaPath(row.id,Boolean(row.deleted_at))}" alt="${row.source==='hardware'?'Ảnh camera':'Ảnh'} của ${esc(row.device_id)}" loading="lazy"><svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${detections.map(d=>`<rect class="ai-box" data-class="${esc(d.pest_code)}" x="${d.x_min*width}" y="${d.y_min*height}" width="${(d.x_max-d.x_min)*width}" height="${(d.y_max-d.y_min)*height}" fill="none"/>`).join('')}</svg></div>`;
+}
+
 let imageLoadVersion=0;
 async function loadImages(){
  const version=++imageLoadVersion, device=$('#image-device').value;
@@ -271,6 +275,7 @@ async function loadImages(){
   $('#image-grid').innerHTML=result.rows.map(row=>`<button class="image-card" data-id="${esc(row.id)}">${imagePreview(row)}<div class="image-info"><h3>${esc(row.device_id)}<span class="tag">${row.source==='simulation'?'Mô phỏng':row.source==='hardware'?'Camera thật':'Ảnh tải lên'}</span></h3><p>${cloudMode?'Nhận lúc ':''}${date(row.captured_at||row.received_at)}</p>${cloudMode?`<p class="image-origin">${esc(imageAttribution(row))}</p>`:''}<p>${row.deleted_at?'Đã xóa · Mở để khôi phục':row.status==='succeeded'?`${row.pest_count} côn trùng · Đã lưu kết quả AI`:cloudMode?(['queued','running'].includes(row.status)?'Chờ AI tự động phân tích':row.status==='failed'?'AI tự động chưa thành công · Có thể thử trên web':'Mở ảnh để phân tích thử'):row.status==='failed'?'Chưa có model thật':'Đang xử lý…'}</p></div></button>`).join('')||`<div class="empty">${cloudMode?'Thư viện chưa có ảnh. Bạn có thể tải ảnh lên hoặc chụp ảnh mới.':'Chưa có ảnh. Bấm “Chụp mô phỏng” để bắt đầu.'}</div>`;
  }
  if(!result.rows.length&&trashed)$('#image-grid').innerHTML='<div class="empty">Thùng rác trống.</div>';
+ if(cloudMode&&canManageDashboard()&&!trashed)setTimeout(()=>runBrowserAssist(),0);
  let latest=result.rows[0];if(trashed||state.imageOffset||device){const first=await api('/api/images?limit=1');latest=first.rows[0];}
  if(version!==imageLoadVersion)return;
  const camera=$('#overview-camera');
@@ -437,6 +442,9 @@ function renderAiResult(panel,{width,height,detections,model_version,truncated})
  overlay.toggleAttribute('hidden',boxes.length===0);
  const result=panel.querySelector('.ai-result');
  result.innerHTML=`<strong>Kết quả nhận diện</strong><div class="ai-counts"><span>Côn trùng <b>${truncated?'≥ ':''}${boxes.length}</b></span><span>Gợi ý loài <b>${boxes.length-counts.unknown}</b></span><span>Chưa rõ loài <b>${counts.unknown}</b></span></div><div class="ai-species-info">${Object.entries(aiInfo).filter(([code])=>counts[code]>0).map(([code,[host,note]])=>`<article><div class="ai-species-heading"><h3>${esc(aiSpecies[code])}</h3><span class="tag">${counts[code]} con</span></div><p><strong>Cây ký chủ:</strong> ${esc(host)}</p><p>${esc(note)}</p></article>`).join('')}</div>`;
+ const download=document.createElement('button');download.type='button';download.className='button secondary';download.textContent='Tải ảnh có khung';
+ download.addEventListener('click',()=>action(download,()=>downloadProcessedPhoto(panel,{detections})));
+ result.append(download);
  result.hidden=false;
  if(cloudMode&&panel.id==='ai-demo')prepareDemoResultTest(model_version,counts).catch(error=>{
   $('#ai-demo-telegram-status').textContent=error.message;
@@ -482,23 +490,81 @@ if(cloudMode){
 
 async function analyzeAiPhoto(panel,imageUrl){
  if(!imageUrl)return;
- const button=panel.querySelector('[data-ai-run]');
- if(button.disabled)return;
- button.disabled=true;
- const cancel=panel.querySelector('[data-ai-cancel]');
- if(cancel)cancel.hidden=false;
- resetAiResult(panel);
- aiStatus(panel,'Đang chuẩn bị mô hình AI…');
+ const button=panel.querySelector('[data-ai-run]');if(button.disabled)return;
+ const photoId=typeof imageUrl==='string'?/^\/media\/([a-f0-9-]{36})$/i.exec(imageUrl)?.[1]:null;
+ let claim;
+ button.disabled=true;const cancel=panel.querySelector('[data-ai-cancel]');if(cancel)cancel.hidden=false;
+ resetAiResult(panel);aiStatus(panel,'Đang chuẩn bị mô hình AI…');
  try{
-  const result=await requestAiInference(panel,imageUrl);
-  renderAiResult(panel,result);
-  aiStatus(panel,'Đã phân tích xong.');
- }catch(error){
-  if(error.name!=='AbortError')aiStatus(panel,error.message||'Chưa phân tích được ảnh.',true);
- }finally{
-  button.disabled=false;
-  if(cancel)cancel.hidden=true;
+  if(photoId&&canManageDashboard()){
+   claim=await api(`/api/images/${photoId}/analysis/claim?reanalyze=1`,{method:'POST'});
+   if(claim.already_completed){renderAiResult(panel,claim.result);aiStatus(panel,'Kết quả và khung đã được lưu.');return;}
+  }
+  let result=await requestAiInference(panel,imageUrl);
+  if(claim){
+   const saved=await api(`/api/images/${photoId}/analysis/complete`,{method:'POST',body:{lease_token:claim.lease_token,result}});
+   claim=null;result=saved.result;await loadImages();
+  }
+  renderAiResult(panel,result);aiStatus(panel,photoId&&canManageDashboard()?'Đã lưu kết quả và khung vào thư viện.':'Đã phân tích xong.');
+ }catch(error){if(error.name!=='AbortError')aiStatus(panel,error.message||'Chưa phân tích được ảnh.',true);}
+ finally{
+  if(claim?.lease_token)await api(`/api/images/${photoId}/analysis/fail`,{method:'POST',body:{lease_token:claim.lease_token}}).catch(()=>{});
+  button.disabled=false;if(cancel)cancel.hidden=true;
  }
+}
+
+let browserAssistBusy=false,browserAssistEnabled=true;
+const browserAssistAttempted=new Set();
+try{browserAssistEnabled=localStorage.getItem('ptit-browser-ai')!=='off';}catch{}
+function browserAssistPanel(){
+ let panel=$('#browser-ai-panel');if(panel)return panel;
+ panel=document.createElement('article');panel.id='browser-ai-panel';panel.className='card';
+ panel.innerHTML='<h2>AI lưu ảnh tự động</h2><label class="check-row"><input type="checkbox" data-browser-ai> Xử lý ảnh camera khi mở trang này</label><p>Khi cloud bị giới hạn, trình duyệt sẽ xử lý ảnh chờ/lỗi và lưu các khung về thư viện.</p><p class="ai-status" role="status"></p><button class="button secondary" type="button" data-browser-retry>Thử lại ảnh lỗi</button>';
+ panel.querySelector('[data-browser-ai]').checked=browserAssistEnabled;
+ panel.querySelector('[data-browser-ai]').addEventListener('change',event=>{
+  browserAssistEnabled=event.target.checked;try{localStorage.setItem('ptit-browser-ai',browserAssistEnabled?'on':'off');}catch{}
+  if(!browserAssistEnabled&&activeAiJob?.panel===panel)activeAiJob.cancel();
+  if(browserAssistEnabled)runBrowserAssist();
+ });
+ panel.querySelector('[data-browser-retry]').addEventListener('click',()=>{browserAssistAttempted.clear();runBrowserAssist();});
+ $('#image-grid').before(panel);return panel;
+}
+async function runBrowserAssist(){
+ if(!cloudMode||!canManageDashboard()||document.hidden||!['images','overview'].includes(state.page))return;
+ const panel=browserAssistPanel();
+ if(!browserAssistEnabled||browserAssistBusy||activeAiJob)return;
+ const row=state.images.find(r=>r.source==='hardware'&&!r.deleted_at&&['queued','failed'].includes(r.status)&&!browserAssistAttempted.has(r.id));
+ if(!row)return;
+ browserAssistBusy=true;browserAssistAttempted.add(row.id);let claim;
+ try{
+  claim=await api(`/api/images/${row.id}/analysis/claim`,{method:'POST'});
+  if(!claim.already_completed){
+   aiStatus(panel,'Đang xử lý ảnh camera · '+date(row.received_at));
+   const result=await requestAiInference(panel,mediaPath(row.id));
+   await api(`/api/images/${row.id}/analysis/complete`,{method:'POST',body:{lease_token:claim.lease_token,result}});
+  }
+  claim=null;aiStatus(panel,'Đã lưu ảnh và khung. Cảnh báo được xét theo ngưỡng của ảnh.');await loadImages();
+ }catch(error){
+  if(error.name!=='AbortError')aiStatus(panel,error.status===409?'Ảnh đang được cloud/phiên khác xử lý.':error.message,true);
+  else browserAssistAttempted.delete(row.id);
+ }finally{
+  if(claim?.lease_token)await api(`/api/images/${row.id}/analysis/fail`,{method:'POST',body:{lease_token:claim.lease_token}}).catch(()=>{});
+  browserAssistBusy=false;
+  if(browserAssistEnabled)setTimeout(()=>runBrowserAssist(),1500);
+ }
+}
+
+async function downloadProcessedPhoto(panel,result){
+ const img=panel.querySelector('.ai-photo img');await img.decode();
+ const canvas=document.createElement('canvas');canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;
+ const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0);ctx.lineWidth=Math.max(2,canvas.width/400);ctx.font=`${Math.max(12,canvas.width/65)}px Arial`;
+ for(const d of result.detections){
+  const x=d.x_min*canvas.width,y=d.y_min*canvas.height,w=(d.x_max-d.x_min)*canvas.width,h=(d.y_max-d.y_min)*canvas.height;
+  ctx.strokeStyle=d.pest_code==='unknown'?'#e3339e':'#1475e8';ctx.fillStyle=ctx.strokeStyle;ctx.strokeRect(x,y,w,h);
+  ctx.fillText(d.pest_code==='unknown'?'Côn trùng':aiSpecies[d.pest_code],x,Math.max(16,y-4));
+ }
+ const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.92));if(!blob)throw new Error('Chưa xuất được ảnh.');
+ const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='PTIT-anh-da-xu-ly.jpg';link.click();setTimeout(()=>URL.revokeObjectURL(url),10000);
 }
 
 function cancelAiPanel(panel){

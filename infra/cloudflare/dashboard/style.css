@@ -231,3 +231,5 @@
 .led-panel p { margin: 7px 0 0; }
 .led-panel .actions { flex-wrap: wrap; }
 @media (max-width: 640px) { .led-panel { align-items: flex-start; flex-direction: column; } }
+#browser-ai-panel { margin: 18px 0; padding: 20px; }
+#browser-ai-panel p { margin: 10px 0; color: var(--muted); }
