@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#244c3d">
+  <title>Đăng nhập · PTIT Garden</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/login.js" defer></script>
+</head>
+<body>
+  <main class="login-page">
+    <section class="login-card" aria-labelledby="login-heading">
+      <div class="brand login-brand">
+        <span class="brand-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 4C9 2 3 8 5 15c6 4 14 0 15-11Z"/><path d="m4 21 11-12"/></svg></span>
+        <span>PTIT<span class="brand-light"> Garden</span><small>SMART AGRICULTURE</small></span>
+      </div>
+      <h1 id="login-heading" tabindex="-1">Đăng nhập</h1>
+      <p id="login-description" class="login-description">Theo dõi số đo, ảnh và cảnh báo của khu vườn.</p>
+      <p id="register-success" class="login-success" role="status" tabindex="-1" hidden></p>
+      <form id="login-form" action="/api/login" method="post">
+        <div class="login-field">
+          <label for="login-username">Tên đăng nhập</label>
+          <input id="login-username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="64" required>
+        </div>
+        <label for="login-password">Mật khẩu</label>
+        <div class="login-password-field">
+          <input id="login-password" name="password" type="password" autocomplete="current-password" maxlength="512" required>
+          <button id="toggle-password" class="login-password-toggle" type="button" aria-controls="login-password" aria-label="Hiện mật khẩu">Hiện</button>
+        </div>
+        <p id="login-error" class="login-error" role="alert" hidden></p>
+        <button id="login-submit" class="button full login-submit" type="submit">Đăng nhập</button>
+      </form>
+      <form id="register-form" action="/api/register" method="post" hidden>
+        <div class="login-field">
+          <label for="register-username">Tên đăng nhập</label>
+          <input id="register-username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" minlength="3" maxlength="32" pattern="[A-Za-z0-9][A-Za-z0-9._\-]{2,31}" aria-describedby="register-username-hint" required>
+          <p id="register-username-hint" class="login-hint">Dùng 3–32 ký tự, bắt đầu bằng chữ không dấu hoặc số. Có thể thêm dấu chấm, gạch dưới và gạch ngang.</p>
+        </div>
+        <div class="login-field">
+          <label for="register-password">Mật khẩu</label>
+          <div class="login-password-field">
+            <input id="register-password" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="128" aria-describedby="register-password-hint" required>
+            <button id="toggle-register-password" class="login-password-toggle" type="button" aria-controls="register-password register-confirm" aria-label="Hiện mật khẩu">Hiện</button>
+          </div>
+          <p id="register-password-hint" class="login-hint">Dùng 12–128 ký tự.</p>
+        </div>
+        <label for="register-confirm">Nhập lại mật khẩu</label>
+        <input id="register-confirm" name="confirmPassword" type="password" autocomplete="new-password" maxlength="128" required>
+        <p id="register-error" class="login-error" role="alert" hidden></p>
+        <button id="register-submit" class="button full login-submit" type="submit">Gửi đăng ký</button>
+      </form>
+      <p id="login-switch" class="login-switch" hidden>
+        <span id="login-switch-prompt">Chưa có tài khoản?</span>
+        <button id="login-switch-button" type="button">Đăng ký</button>
+      </p>
+      <noscript><p class="login-error">Bật JavaScript trong trình duyệt để đăng nhập.</p></noscript>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,1 @@
+"""PTIT garden monitoring application."""

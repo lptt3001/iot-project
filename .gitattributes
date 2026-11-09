@@ -1,0 +1,12 @@
+* text=auto eol=lf
+*.cmd text eol=crlf
+*.md whitespace=-blank-at-eol
+app/static/ai/ort-1.22.0/* -whitespace
+*.onnx binary
+*.pt binary
+*.pth binary
+*.wasm binary
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.pdf binary

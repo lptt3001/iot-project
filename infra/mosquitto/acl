@@ -1,0 +1,12 @@
+# Explicit farm/device grants: no global wildcard for device accounts.
+user station-001
+topic write iot/v1/farms/farm-demo/devices/station-001/telemetry
+topic write iot/v1/farms/farm-demo/devices/station-001/status
+
+user station-002
+topic write iot/v1/farms/farm-demo/devices/station-002/telemetry
+topic write iot/v1/farms/farm-demo/devices/station-002/status
+
+user backend-ingestor
+topic read iot/v1/farms/+/devices/+/telemetry
+topic read iot/v1/farms/+/devices/+/status

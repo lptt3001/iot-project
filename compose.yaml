@@ -1,0 +1,77 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    stop_grace_period: 45s
+    environment:
+      DB_HOST: database
+      MQTT_HOST: mosquitto
+    ports:
+      - 127.0.0.1:8000:8000
+    volumes:
+      - ./.secrets:/app/.secrets
+      - app_data:/app/.runtime
+    depends_on:
+      database:
+        condition: service_healthy
+      mosquitto:
+        condition: service_started
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [iot]
+  database:
+    image: timescale/timescaledb:2.23.1-pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: iot
+      POSTGRES_USER: iot_admin
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_admin_password
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+      TZ: UTC
+    command: [postgres, -c, shared_preload_libraries=timescaledb, -c, password_encryption=scram-sha-256]
+    ports:
+      - 127.0.0.1:${POSTGRES_PORT:-5432}:5432
+    secrets:
+      - db_admin_password
+      - db_app_password
+      - db_ingest_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U iot_admin -d iot]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [iot]
+  mosquitto:
+    image: eclipse-mosquitto:2.1.2-alpine
+    user: '1883:1883'
+    restart: unless-stopped
+    ports:
+      - ${MQTT_BIND_ADDRESS:-127.0.0.1}:${MQTT_PORT:-8883}:8883
+    volumes:
+      - ./infra/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./infra/mosquitto/acl:/mosquitto/config/acl:ro
+      - ./.secrets/mqtt-passwords:/mosquitto/config/passwords:ro
+      - ./.secrets/certs/server.crt:/mosquitto/certs/server.crt:ro
+      - ./.secrets/certs/server.key:/mosquitto/certs/server.key:ro
+      - mosquitto_data:/mosquitto/data
+    networks: [iot]
+secrets:
+  db_admin_password:
+    file: ./.secrets/db_admin_password
+  db_app_password:
+    file: ./.secrets/db_app_password
+  db_ingest_password:
+    file: ./.secrets/db_ingest_password
+volumes:
+  app_data:
+  postgres_data:
+  mosquitto_data:
+networks:
+  iot:
+    driver: bridge

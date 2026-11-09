@@ -1,0 +1,75 @@
+{
+  "samples": [
+    {
+      "id": "bo-phan",
+      "title": "Bẫy có bọ phấn",
+      "image": "/static/ai/demo/bo-phan.jpg",
+      "ground_truth": {
+        "whitefly": 2,
+        "black_aphid": 0
+      },
+      "source_photo": "PestNu - Yellow Glue Paper Traps Dataset/valid/12.jpg",
+      "source_region": [
+        2317,
+        19,
+        416,
+        416
+      ]
+    },
+    {
+      "id": "rep-den",
+      "title": "Bẫy có rệp đen",
+      "image": "/static/ai/demo/rep-den.jpg",
+      "ground_truth": {
+        "whitefly": 0,
+        "black_aphid": 2
+      },
+      "source_photo": "PestNu - Yellow Glue Paper Traps Dataset/valid/120.jpg",
+      "source_region": [
+        2177,
+        578,
+        416,
+        416
+      ]
+    },
+    {
+      "id": "hai-loai",
+      "title": "Bẫy có hai loại",
+      "image": "/static/ai/demo/hai-loai.jpg",
+      "ground_truth": {
+        "whitefly": 3,
+        "black_aphid": 3
+      },
+      "source_photo": "PestNu - Yellow Glue Paper Traps Dataset/valid/166.jpg",
+      "source_region": [
+        2038,
+        1168,
+        416,
+        416
+      ]
+    },
+    {
+      "id": "nen-bay",
+      "title": "Vùng bẫy không có nhãn",
+      "image": "/static/ai/demo/nen-bay.jpg",
+      "ground_truth": {
+        "whitefly": 0,
+        "black_aphid": 0
+      },
+      "source_photo": "PestNu - Yellow Glue Paper Traps Dataset/valid/126.jpg",
+      "source_region": [
+        3231,
+        1589,
+        416,
+        416
+      ]
+    }
+  ],
+  "source": {
+    "title": "Yellow Glue Paper Traps Dataset",
+    "url": "https://doi.org/10.5281/zenodo.7139220",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "credit": "Nikolaos Giakoumoglou, Eleftheria-Maria Pechlivani, Nikolaos Katsoulas, and Dimitrios Tzovaras"
+  }
+}

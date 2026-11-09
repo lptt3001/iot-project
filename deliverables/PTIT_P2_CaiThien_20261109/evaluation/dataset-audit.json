@@ -1,0 +1,51 @@
+{
+  "totals": {
+    "train": {
+      "images": 2412,
+      "boxes": 24976,
+      "empty_images": 67
+    },
+    "val": {
+      "images": 95,
+      "boxes": 1174,
+      "empty_images": 0
+    },
+    "test": {
+      "images": 197,
+      "boxes": 2445,
+      "empty_images": 0
+    }
+  },
+  "source_photos": {
+    "train": 276,
+    "val": 95,
+    "test": 197
+  },
+  "groups": {
+    "train": [
+      170,
+      181,
+      182,
+      183,
+      188,
+      189,
+      190
+    ],
+    "val": [
+      174,
+      184
+    ],
+    "test": [
+      172,
+      176,
+      179,
+      186
+    ]
+  },
+  "cross_split_exact_duplicates": [],
+  "limitations": [
+    "Public source boxes are not independently expert verified and may omit tiny insects.",
+    "Filename sequence groups are not verified independent capture days or traps.",
+    "Held-out test was used for the earlier v1 report; it is not a new unseen field collection."
+  ]
+}

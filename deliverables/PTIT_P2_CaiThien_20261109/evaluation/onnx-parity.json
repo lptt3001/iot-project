@@ -1,0 +1,32 @@
+{
+  "onnx": "C:\\Users\\Admin\\AppData\\Local\\Packages\\OpenAI.Codex_2p2nqsd0c76g0\\LocalCache\\Local\\PTIT-Garden-AI\\p2-improved-20261109\\runs\\p2\\weights\\best.onnx",
+  "sha256": "56593aaff227d6a27907dedb7a89ca0eddb35a73fa026d0d92a3ec923bfe03e0",
+  "input_shape": [
+    1,
+    3,
+    640,
+    640
+  ],
+  "output_shape": [
+    1,
+    5,
+    34000
+  ],
+  "samples": [
+    {
+      "image": "8649_real_219316543.jpg",
+      "box_max_abs_error_px": 0.0023193359375,
+      "score_max_abs_error": 2.4586915969848633e-06
+    },
+    {
+      "image": "8614_real_219290104.jpg",
+      "box_max_abs_error_px": 0.003143310546875,
+      "score_max_abs_error": 1.817941665649414e-06
+    },
+    {
+      "image": "8978_real_219123595.jpg",
+      "box_max_abs_error_px": 0.0018463134765625,
+      "score_max_abs_error": 2.2649765014648438e-06
+    }
+  ]
+}

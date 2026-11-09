@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "message_id": "00000000-0000-4000-8000-000000000200",
+  "device_id": "station-001",
+  "farm_id": "farm-demo",
+  "observed_at": "2026-10-26T02:00:00Z",
+  "measurements": {"temperature_c": 29.5, "air_humidity_pct": 76.2, "soil_moisture_pct": 58},
+  "battery_v": 3.9,
+  "rssi_dbm": -62
+}

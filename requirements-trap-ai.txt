@@ -1,0 +1,5 @@
+# Optional Python environment for six-class trap inference and adaptation.
+ultralytics==8.4.203
+numpy<2
+opencv-python==4.11.0.86
+httpx>=0.28,<1

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PTIT IoT telemetry v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "message_id", "device_id", "farm_id", "observed_at", "measurements"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "source": {"enum": ["simulation", "hardware", "mqtt"]},
+    "message_id": {"type": "string", "format": "uuid"},
+    "device_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,62}$"},
+    "farm_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,62}$"},
+    "observed_at": {"type": "string", "format": "date-time", "pattern": "Z$"},
+    "measurements": {
+      "type": "object", "additionalProperties": false, "minProperties": 1,
+      "properties": {
+        "temperature_c": {"type": "number", "minimum": -40, "maximum": 125},
+        "air_humidity_pct": {"type": "number", "minimum": 0, "maximum": 100},
+        "soil_moisture_pct": {"type": "number", "minimum": 0, "maximum": 100},
+        "soil_raw": {"type": "integer", "minimum": 0, "maximum": 4095},
+        "light_do": {"type": "integer", "enum": [0, 1]},
+        "rain_do": {"type": "integer", "enum": [0, 1]}
+      }
+    },
+    "battery_v": {"type": "number", "minimum": 0, "maximum": 30},
+    "rssi_dbm": {"type": "integer", "minimum": -127, "maximum": 0}
+  }
+}

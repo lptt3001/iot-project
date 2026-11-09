@@ -1,0 +1,16 @@
+{
+  "model_file": "model-736268ae7b96.onnx",
+  "model_version": "PestNu YOLOX-Nano v2",
+  "classes": [
+    "whitefly",
+    "black_aphid"
+  ],
+  "channel_order": "BGR",
+  "input_size": 416,
+  "confidence_threshold": 0.3,
+  "iou_threshold": 0.45,
+  "confidence_thresholds": {
+    "whitefly": 0.4,
+    "black_aphid": 0.35
+  }
+}

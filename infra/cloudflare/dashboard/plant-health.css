@@ -1,0 +1,67 @@
+.plant-health-panel{margin:20px 0;padding:22px}
+.plant-health-panel>p{line-height:1.65;color:#607365;margin:10px 0 18px}
+.plant-health-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.plant-health-rule,.pest-advice-item{border:1px solid #dce4d7;border-radius:12px;padding:18px;background:#fafcf7}
+.plant-health-rule h3,.pest-advice-item h3{font-size:17px;margin:12px 0 8px}
+.plant-health-rule p,.pest-advice-item p{line-height:1.6;font-size:13px;margin:9px 0;overflow-wrap:anywhere}
+.plant-health-rule .health-threshold{color:#294d37;font-size:15px;font-weight:600}
+.health-badge{display:inline-block;background:#edf1e9;color:#536452;border-radius:20px;padding:5px 10px;font-size:12px;font-weight:600}
+.health-badge[data-stage=early],.health-badge[data-stage=sustained]{background:#fff0d2;color:#795315}
+.health-table-wrap{overflow-x:auto}.health-table{border-collapse:collapse;table-layout:fixed;width:100%;font-size:13px;text-align:left}
+.health-table th,.health-table td{padding:10px;border-bottom:1px solid #e0e7db;line-height:1.6;vertical-align:top;white-space:normal;overflow-wrap:anywhere}
+.health-table th:first-child{width:29%}.health-table th:nth-child(2){width:14%}.health-table th:nth-child(3){width:28%}.health-table th:nth-child(4){width:29%}
+.pest-advice{margin-top:20px}.pest-advice-item{margin:12px 0;background:#fffaf0;border-color:#e8dec9}
+.plant-health-alert .alert-content p{white-space:pre-line;font-size:13px;line-height:1.65}
+#plant-health-summary{margin-bottom:20px;line-height:1.6}
+.telegram-recipient{border:1px solid #dfe6d9;border-radius:10px;margin:14px 0;padding:16px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.telegram-recipient p{font-size:12px;line-height:1.65;margin:8px 0;color:#657560}
+.telegram-recipient .health-badge{margin-left:10px}.telegram-recipient .actions{align-self:center}
+.telegram-recipient [data-state=ready]{background:#e5f1df;color:#416738}.telegram-recipient [data-state=blocked],.telegram-recipient [data-state=error]{background:#fff0e7;color:#95583f}
+#telegram-test-status{font-size:13px;line-height:1.6;margin-top:12px}
+.observation-profile{padding:22px;margin:0 0 18px}.observation-profile label{display:block;max-width:460px;margin:15px 0}
+.observation-profile select{display:block;width:100%;margin-top:8px;padding:10px;border:1px solid #dbe4d6;border-radius:7px;background:white}
+.observation-rule-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:18px}
+.observation-rule{padding:22px}.observation-rule h2{line-height:1.5;margin-bottom:12px}.observation-rule>p{font-size:13px;line-height:1.7;margin:12px 0}
+.observation-rule .actions{flex-wrap:wrap;margin:10px 0 16px}.observation-rule .button{white-space:normal}
+.health-badge[data-stage=warning]{background:#fff0d2;color:#795315}.health-badge[data-stage=needs_calibration]{background:#eef0f3;color:#5f6571}
+@media(max-width:760px){.plant-health-grid{grid-template-columns:1fr}.plant-health-panel{padding:16px}.health-table th,.health-table td{padding:9px}}
+
+/* Compact result cards share the dashboard's typography and spacing. */
+.ai-result { display: block; margin: 24px 0 0; padding-top: 20px; border-top: 1px solid var(--line); }
+.ai-result > strong { display: block; font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+.ai-counts { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin: 0 0 16px; }
+.ai-counts span { display: flex; flex-direction: column; gap: 8px; padding: 16px; border: 1px solid #e2e8dc; border-radius: 10px; background: #f7f9f4; color: #60715c; font-size: 12px; }
+.ai-counts b { margin: auto 0 0; font-size: 28px; font-weight: 600; line-height: 1.2; color: var(--ink); font-variant-numeric: tabular-nums; }
+.ai-species-info { gap: 12px; }
+.ai-species-info:empty { display: none; }
+.ai-species-info article { padding: 18px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.ai-species-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.ai-species-info .ai-species-heading h3 { margin: 0; font-size: 15px; line-height: 1.5; }
+.ai-species-heading .tag { flex-shrink: 0; }
+.ai-species-info p, #image-detail .ai-species-info p { color: #60715c; font-size: 13px; line-height: 1.7; margin: 6px 0 0; }
+.ai-species-info p strong { font-weight: 500; color: #3d523b; }
+.ai-status:empty, #upload-save-status:empty, #telegram-pairing-status:empty { display: none; }
+.ai-demo > .ai-controls { margin-top: 20px; }
+#ai-demo-telegram { margin: 20px 0 0; background: #f7f9f4; color: var(--ink); }
+#ai-demo-telegram > p:first-child { margin-top: 0; }
+.plant-health-panel > h2 { margin-bottom: 18px; }
+.plant-health-alert .alert-content p { line-height: 1.75; }
+.observation-rule-form { margin-top: 20px; }
+.observation-rule .info-box { font-size: 12px; color: #60715c; }
+.pest-alert-list { margin-bottom: 20px; }
+.pest-alert-head, .pest-species-row { display: grid; grid-template-columns: minmax(0,1fr) 76px; gap: 12px; align-items: center; }
+.pest-alert-head { color: #6d7c65; font-size: 11px; margin-bottom: 4px; }
+.pest-alert-head span:last-child { text-align: center; }
+.pest-species-row { padding: 12px 0; border-bottom: 1px solid var(--line); }
+.pest-species-row .pest-species-choice { display: flex; flex-direction: row; align-items: center; gap: 9px; margin: 0; color: var(--ink); font-size: 12px; line-height: 1.6; cursor: pointer; }
+.pest-species-row input[type=number] { width: 100%; min-width: 0; padding: 10px 8px; text-align: center; }
+.pest-species-row input:disabled { background: #f4f6f1; color: #9ba592; }
+.pest-species-row:has(input[type=checkbox]:not(:checked)) .pest-species-choice { color: #788575; }
+.pest-unknown-row { border-top: 1px dashed #d5ddce; border-bottom: 0; margin-top: 6px; }
+@media(max-width:480px) {
+ .ai-counts { gap: 8px; }
+ .ai-counts span { padding: 12px 8px; font-size: 11px; }
+ .ai-counts b { font-size: 24px; }
+ .ai-species-info article { padding: 14px; }
+ .ai-species-heading { gap: 8px; }
+}

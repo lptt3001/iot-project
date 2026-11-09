@@ -1,0 +1,126 @@
+{
+  "version": "PTIT Trap YOLOv8n 6 loai v1",
+  "architecture": "YOLOv8n",
+  "model_file": "PTIT_Trap_6Loai_CaiThien_v1.pt",
+  "onnx_file": "PTIT_Trap_6Loai_CaiThien_v1.onnx",
+  "model_sha256": "236cca30a255f140659953e26ba9c99b2925bb0ac9c365ffca1a2a313cc5ef2d",
+  "onnx_sha256": "ca8b834e8d52f62a0e8ef54b50a5d3449136ae41e13b3418de54a5ca6b1ccca1",
+  "classes": [
+    "Cnaphalocrocis_medinalis",
+    "Plutella_xylostella",
+    "Ostrinia_furnacalis",
+    "Scotinophara_coarctata",
+    "Conogethes_punctiferalis",
+    "Diaphania_indica"
+  ],
+  "thresholds": {
+    "Cnaphalocrocis_medinalis": 0.7,
+    "Plutella_xylostella": 0.7,
+    "Ostrinia_furnacalis": 0.7,
+    "Scotinophara_coarctata": 0.7,
+    "Conogethes_punctiferalis": 0.7,
+    "Diaphania_indica": 0.7
+  },
+  "threshold_policy": "Retained original fixed 0.70 preset; validation-calibrated thresholds are experimental and not the default.",
+  "validation_selected_thresholds": {
+    "Cnaphalocrocis_medinalis": 0.5,
+    "Plutella_xylostella": 0.1,
+    "Ostrinia_furnacalis": 0.2,
+    "Scotinophara_coarctata": 0.7,
+    "Conogethes_punctiferalis": 0.7,
+    "Diaphania_indica": 0.7
+  },
+  "input_shape": [
+    1,
+    3,
+    640,
+    640
+  ],
+  "output_shape": [
+    1,
+    10,
+    8400
+  ],
+  "color": "RGB",
+  "normalization": "0..1",
+  "letterbox": "center, 114 padding",
+  "tiling": {
+    "size": 320,
+    "overlap": 0.5,
+    "internal_edge_px": 3,
+    "tile_nms_iou": 0.7,
+    "merge_iou": 0.45,
+    "cross_class_merge_iou": 0.85
+  },
+  "source_commit": "206e0a990edb99efa75ca7beb9d5f1243c807c0d",
+  "source_url": "https://github.com/kkb20334-lang/RicePest-30",
+  "source_license": "CC BY-NC 4.0 per RicePest-30; retain other source attributions in original package.",
+  "training_source_photos": 276,
+  "replay_old_training_images": 480,
+  "validation_photos": 95,
+  "heldout_test_photos": 197,
+  "checkpoint_selection": "maximum validation macro F1 across the three supported trap classes; thresholds selected per class on validation only",
+  "limitations": [
+    "Experimental detection/counts; manual verification required.",
+    "Trap holdout has labels for only three supported species.",
+    "Source species/boxes have not been independently expert verified.",
+    "Not validated on this project actual ESP32 trap photos."
+  ],
+  "heldout_fixed_0.70_metrics": {
+    "original_full": {
+      "tp": 21,
+      "fp": 13,
+      "fn": 448,
+      "truth": 469,
+      "predicted": 34,
+      "absolute_count_error": 437,
+      "precision": 0.6176470588235294,
+      "recall": 0.04477611940298507,
+      "f1": 0.08349900596421471,
+      "count_mae": 2.218274111675127
+    },
+    "original_tiled": {
+      "tp": 31,
+      "fp": 40,
+      "fn": 438,
+      "truth": 469,
+      "predicted": 71,
+      "absolute_count_error": 404,
+      "precision": 0.43661971830985913,
+      "recall": 0.06609808102345416,
+      "f1": 0.11481481481481481,
+      "count_mae": 2.050761421319797
+    },
+    "phase2_last_tiled": {
+      "tp": 121,
+      "fp": 37,
+      "fn": 348,
+      "truth": 469,
+      "predicted": 158,
+      "absolute_count_error": 333,
+      "precision": 0.7658227848101266,
+      "recall": 0.2579957356076759,
+      "f1": 0.38596491228070173,
+      "count_mae": 1.6903553299492386
+    }
+  },
+  "old_provided_test_metrics": {
+    "metrics/precision(B)": 0.911477068969317,
+    "metrics/recall(B)": 0.9398701298701299,
+    "metrics/mAP50(B)": 0.9645151901973801,
+    "metrics/mAP50-95(B)": 0.7353473263874265,
+    "fitness": 0.7353473263874265
+  },
+  "diagnostic_15_metrics": {
+    "tp": 21,
+    "fp": 1,
+    "fn": 105,
+    "truth": 126,
+    "predicted": 22,
+    "absolute_count_error": 104,
+    "precision": 0.9545454545454546,
+    "recall": 0.16666666666666666,
+    "f1": 0.28378378378378377,
+    "count_mae": 6.933333333333334
+  }
+}

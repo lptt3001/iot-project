@@ -1,0 +1,54 @@
+{
+  "model_version": "ptit-insects-p2-preserved-20261109-v1",
+  "classes": [
+    "Cnaphalocrocis_medinalis",
+    "Plutella_xylostella",
+    "Ostrinia_furnacalis",
+    "Scotinophara_coarctata",
+    "Conogethes_punctiferalis",
+    "Diaphania_indica"
+  ],
+  "insect_model": "model-56593aaff227.onnx",
+  "insect_sha256": "56593aaff227d6a27907dedb7a89ca0eddb35a73fa026d0d92a3ec923bfe03e0",
+  "insect_threshold": 0.525,
+  "species_model": "model-ca8b834e8d52.onnx",
+  "species_sha256": "ca8b834e8d52f62a0e8ef54b50a5d3449136ae41e13b3418de54a5ca6b1ccca1",
+  "species_threshold": 0.7,
+  "species_margin": 0.15,
+  "input": "RGB float32 /255; 640 square letterbox114; full+320 tiles; NMS.45",
+  "generic_validation": {
+    "threshold": 0.525,
+    "tp": 367,
+    "fp": 152,
+    "fn": 807,
+    "truth": 1174,
+    "predicted": 519,
+    "absolute_count_error": 673,
+    "precision": 0.7071290944123314,
+    "recall": 0.3126064735945486,
+    "f1": 0.43354991139988186,
+    "count_mae": 7.08421052631579,
+    "f05": 0.5646153846153846
+  },
+  "generic_test": {
+    "tp": 1217,
+    "fp": 517,
+    "fn": 1228,
+    "truth": 2445,
+    "predicted": 1734,
+    "absolute_count_error": 863,
+    "precision": 0.701845444059977,
+    "recall": 0.49775051124744374,
+    "f1": 0.5824359894711654,
+    "count_mae": 4.380710659898477
+  },
+  "limitations": "Experimental; incomplete annotations, unknown species and debris can be missed or confused. Not calibrated probability. Not a plant disease diagnosis.",
+  "training_data": {
+    "name": "RicePest-30 + six-species replay",
+    "url": "https://github.com/kkb20334-lang/RicePest-30",
+    "license": "CC BY-NC 4.0",
+    "commit": "206e0a990edb99efa75ca7beb9d5f1243c807c0d"
+  },
+  "architecture": "YOLOv8n preserved P3/P4/P5 + parallel P2 (stride4), 34000 points",
+  "comparison_scope": "Generic single-class insect detection, not six-species accuracy or full browser pipeline"
+}

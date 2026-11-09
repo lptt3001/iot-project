@@ -1,0 +1,20 @@
+{$GARDEN_PUBLIC_HOST} {
+	header Strict-Transport-Security "max-age=31536000"
+
+	@device path_regexp ingress ^/device/v1/[a-z0-9-]+/(telemetry|images/[a-fA-F0-9-]+)$
+	handle @device {
+		request_body {
+			max_size 2097152
+		}
+		reverse_proxy app:8000
+	}
+
+	handle {
+		basic_auth {
+			{env.GARDEN_ADMIN_USER} {env.GARDEN_ADMIN_HASH}
+		}
+		reverse_proxy app:8000 {
+			header_up -Authorization
+		}
+	}
+}

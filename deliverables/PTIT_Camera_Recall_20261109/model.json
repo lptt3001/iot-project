@@ -1,0 +1,75 @@
+{
+  "model_version": "ptit-insects-p2-camera-recall-20261109-v2",
+  "classes": [
+    "Cnaphalocrocis_medinalis",
+    "Plutella_xylostella",
+    "Ostrinia_furnacalis",
+    "Scotinophara_coarctata",
+    "Conogethes_punctiferalis",
+    "Diaphania_indica"
+  ],
+  "insect_model": "model-03244ece8737.onnx",
+  "insect_sha256": "03244ece87370b4b4f09c7950a5e8128aa1e0681ff3956d9d034e90de037c0e4",
+  "insect_threshold": 0.075,
+  "species_model": "model-ca8b834e8d52.onnx",
+  "species_sha256": "ca8b834e8d52f62a0e8ef54b50a5d3449136ae41e13b3418de54a5ca6b1ccca1",
+  "species_threshold": 0.7,
+  "species_margin": 0.15,
+  "input": "RGB float32 /255; 640 square letterbox114; full+320 tiles; NMS.45",
+  "limitations": "Recall-first experimental operating point. Substantial false positives, including screen borders/icons in rephotographs. Counts are model predictions, not verified insects; no pathogen diagnosis.",
+  "training_data": {
+    "name": "RicePest-30 + six-species replay",
+    "url": "https://github.com/kkb20334-lang/RicePest-30",
+    "license": "CC BY-NC 4.0",
+    "commit": "206e0a990edb99efa75ca7beb9d5f1243c807c0d"
+  },
+  "architecture": "YOLOv8n preserved P3/P4/P5 + parallel P2 (stride4), 34000 points",
+  "detection_profile": "recall",
+  "generic_validation": {
+    "threshold": 0.075,
+    "tp": 731,
+    "fp": 2655,
+    "fn": 443,
+    "truth": 1174,
+    "predicted": 3386,
+    "absolute_count_error": 2238,
+    "precision": 0.215888954518606,
+    "recall": 0.6226575809199318,
+    "f1": 0.3206140350877193,
+    "count_mae": 23.557894736842105,
+    "f2": 0.45223954466716154,
+    "f3": 0.5239392201834862
+  },
+  "generic_test": {
+    "threshold": 0.075,
+    "tp": 1949,
+    "fp": 7037,
+    "fn": 496,
+    "truth": 2445,
+    "predicted": 8986,
+    "absolute_count_error": 6543,
+    "precision": 0.2168929445804585,
+    "recall": 0.7971370143149284,
+    "f1": 0.34100253696089583,
+    "count_mae": 33.213197969543145,
+    "f2": 0.5192902056911435,
+    "f3": 0.6288922590429479
+  },
+  "comparison_scope": "Generic detector on synthetic camera-degraded source photos, full + 320 tiles and global NMS .45, before species fusion. Reused source split, not new field accuracy.",
+  "camera_adaptation": {
+    "epochs": 8,
+    "training_images": 819,
+    "validation_images": 95,
+    "test_images": 197,
+    "base_checkpoint_sha256": "c286e3e82d8d4ad2c6bac7e6358ea93996f3636691e49c60c54fd6ad20ab0ff4",
+    "degradations": [
+      "blur",
+      "gamma darkening",
+      "vignetting",
+      "noise",
+      "JPEG compression"
+    ],
+    "user_photos_used_for_training": false,
+    "selection_policy": "Select on degraded validation only: maximize F3 (recall weighted nine times), threshold <=0.20; adapted weights must improve F3 without >2 percentage point recall regression. User photos are debug examples, not ground truth."
+  }
+}

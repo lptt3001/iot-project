@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="vi">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#244c3d"><title>PTIT Garden · Vườn thông minh</title><link rel="stylesheet" href="/static/style.css"><link rel="stylesheet" href="/static/accounts.css"><script src="/static/app.js" defer></script></head>
+<body>
+<svg class="icon-defs" aria-hidden="true"><defs>
+<symbol id="leaf" viewBox="0 0 24 24"><path d="M20 4C9 2 3 8 5 15c6 4 14 0 15-11Z"/><path d="m4 21 11-12"/></symbol>
+<symbol id="grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+<symbol id="signal" viewBox="0 0 24 24"><path d="M4 9a12 12 0 0 1 16 0M7 13a8 8 0 0 1 10 0M10 17a3 3 0 0 1 4 0"/><circle cx="12" cy="21" r=".5"/></symbol>
+<symbol id="camera" viewBox="0 0 24 24"><path d="m8 5 2-2h4l2 2h4v16H4V5Z"/><circle cx="12" cy="13" r="4"/></symbol>
+<symbol id="bell" viewBox="0 0 24 24"><path d="M5 17h14l-2-4V9a5 5 0 0 0-10 0v4Zm5 4h4"/></symbol>
+<symbol id="sliders" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="8" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="10" cy="18" r="2"/></symbol>
+<symbol id="play" viewBox="0 0 24 24"><path d="m8 4 12 8-12 8Z"/></symbol>
+<symbol id="drop" viewBox="0 0 24 24"><path d="M12 2C10 7 5 11 5 15a7 7 0 0 0 14 0c0-4-5-8-7-13Z"/></symbol>
+<symbol id="temp" viewBox="0 0 24 24"><path d="M9 14V5a3 3 0 0 1 6 0v9a5 5 0 1 1-6 0Zm3-7v10"/></symbol>
+<symbol id="download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></symbol>
+<symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></symbol>
+<symbol id="logout" viewBox="0 0 24 24"><path d="M10 4H5v16h5m3-4 4-4-4-4m-4 4h10"/></symbol>
+<symbol id="users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2m1-15a3 3 0 0 1 0 6m2 3a4 4 0 0 1 3 4v2"/></symbol>
+</defs></svg>
+<aside class="sidebar">
+ <a class="brand" href="#overview"><span class="brand-icon"><svg><use href="#leaf"/></svg></span><span>PTIT<span class="brand-light"> Garden</span><small>SMART AGRICULTURE</small></span></a>
+ <div class="workspace"><span class="workspace-icon">P</span><div>Vườn thử nghiệm<small>PTIT · Hà Nội</small></div><span class="chevron">⌄</span></div>
+ <p class="nav-label">KHÔNG GIAN LÀM VIỆC</p>
+ <nav aria-label="Điều hướng chính">
+ <a href="#overview" data-page="overview"><svg><use href="#grid"/></svg>Tổng quan</a>
+ <a href="#devices" data-page="devices"><svg><use href="#signal"/></svg>Trạm & cảm biến</a>
+ <a href="#images" data-page="images"><svg><use href="#camera"/></svg>Camera & nhận diện</a>
+ <a href="#alerts" data-page="alerts"><svg><use href="#bell"/></svg>Cảnh báo<span id="nav-alerts" class="count">0</span></a>
+ <a href="#simulation" data-page="simulation" data-local-only><svg><use href="#play"/></svg>Phòng mô phỏng</a>
+ <a href="#settings" data-page="settings" data-dashboard-admin><svg><use href="#sliders"/></svg>Thiết lập ngưỡng</a>
+ <a href="#accounts" data-page="accounts" aria-label="Duyệt tài khoản" title="Duyệt tài khoản" hidden><svg aria-hidden="true"><use href="#users"/></svg>Duyệt tài khoản</a>
+ </nav>
+ <div class="sidebar-bottom"><div class="demo-note"><span class="dot"></span> Môi trường mô phỏng<p>Khám phá vườn thông minh ngay trên máy, chưa cần phần cứng.</p></div><div class="profile"><span class="avatar">PT</span><div><span id="profile-role">Người vận hành</span><small>Phiên demo cục bộ</small></div></div></div>
+</aside>
+<div class="main-wrap"><header class="topbar"><div class="breadcrumb">Không gian làm việc <span>/</span> <strong id="breadcrumb">Tổng quan</strong></div><div class="top-actions"><span id="connection" class="status muted"><i></i>Đang kết nối</span><button class="icon-button" id="notifications-button" title="Thông báo" aria-label="Mở thông báo"><svg><use href="#bell"/></svg><span id="unread-dot" hidden></span></button><button class="icon-button" id="logout-button" type="button" title="Đăng xuất" aria-label="Đăng xuất" hidden><svg aria-hidden="true"><use href="#logout"/></svg></button><span class="avatar small">PT</span></div></header>
+<main>
+<div id="error-banner" class="error-banner" hidden role="alert"></div>
+<section id="page-overview" class="page">
+ <div class="page-heading"><div><p class="eyebrow">VƯỜN THỬ NGHIỆM PTIT</p><h1>Một góc nhìn, cả khu vườn.</h1><p class="subtitle">Theo dõi môi trường và phát hiện nguy cơ theo thời gian thực.</p></div><button class="button secondary export"><svg><use href="#download"/></svg>Xuất dữ liệu</button></div>
+ <div class="hero"><div><span class="hero-label"><span class="dot"></span> VƯỜN ĐANG ĐƯỢC THEO DÕI</span><h2 id="hero-title">Đang kết nối khu vườn của bạn</h2><p id="hero-description">Dữ liệu từ hai trạm mô phỏng sẽ xuất hiện tại đây.</p><a href="#simulation" class="hero-link">Khám phá phòng mô phỏng <svg><use href="#arrow"/></svg></a></div><div class="hero-art" aria-hidden="true"><div class="sun"></div><div class="plant p1"><i></i><b></b><em></em></div><div class="plant p2"><i></i><b></b><em></em></div><div class="plant p3"><i></i><b></b><em></em></div><div class="ground"></div><span class="art-label">GROW WITH INSIGHT</span></div></div>
+ <div id="metrics" class="metrics"></div>
+ <div class="dashboard-grid"><article class="card chart-card"><div class="card-heading"><div><h2>Nhịp sống khu vườn</h2><p>Dữ liệu trung bình theo thời gian · UTC+7</p></div><select id="chart-hours" aria-label="Khoảng thời gian"><option value="1">1 giờ qua</option><option value="6">6 giờ qua</option><option value="24">24 giờ qua</option><option value="168">7 ngày qua</option></select></div><div class="chart-toolbar"><div class="segmented" id="chart-tabs"><button data-metric="temperature_c" class="selected">Nhiệt độ</button><button data-metric="air_humidity_pct">Độ ẩm KK</button><button data-metric="soil_moisture_pct">Độ ẩm đất</button></div><div class="legend"><span><i></i>Trạm 01</span><span><i></i>Trạm 02</span></div></div><div id="chart" class="chart"></div><div class="chart-foot"><span id="chart-summary">Đang nhận dữ liệu…</span><span><span class="dot"></span> Tự cập nhật</span></div></article>
+ <article class="card"><div class="card-heading"><div><h2 id="station-heading">Vị trí các trạm</h2><p id="station-description">Sơ đồ vườn · tọa độ mô phỏng</p></div><span id="station-count" class="tag">2 trạm</span></div><div id="garden-map" class="garden-map"></div><div id="map-devices" class="map-devices"></div></article>
+ <article class="card"><div class="card-heading"><div><h2>Góc nhìn từ camera</h2><p id="overview-camera-description">Ảnh bẫy và kết quả xử lý mô phỏng</p></div><a href="#images" class="text-link">Xem tất cả ↗</a></div><div id="overview-camera" class="overview-camera empty">Đang chờ ảnh đầu tiên…</div></article>
+ <article class="card"><div class="card-heading"><div><h2>Cần chú ý</h2><p>Cảnh báo mới nhất trong vườn</p></div><a href="#alerts" class="text-link">Xem tất cả ↗</a></div><div id="overview-alerts"></div></article></div>
+ <div class="system-strip" id="system-strip"></div>
+</section>
+<section id="page-devices" class="page" hidden><div class="page-heading"><div><p class="eyebrow">KẾT NỐI KHU VƯỜN</p><h1>Trạm & cảm biến</h1><p class="subtitle">Trạng thái thực từ luồng MQTT; dữ liệu đo được tạo bởi bộ mô phỏng.</p></div><button class="button secondary export"><svg><use href="#download"/></svg>Xuất CSV</button></div><div id="device-cards" class="two-columns"></div><article class="card history-card"><div class="card-heading"><div><h2>Lịch sử cảm biến</h2><p>60 nhóm dữ liệu gần nhất trong khoảng đã chọn</p></div><select id="history-device" aria-label="Lọc trạm" data-local-only><option value="">Tất cả trạm</option><option>station-001</option><option>station-002</option></select></div><div class="table-wrap"><table><thead><tr><th>Thời gian (UTC+7)</th><th>Trạm</th><th>Nhiệt độ</th><th>Độ ẩm KK</th><th id="history-soil-heading">Độ ẩm đất</th><th id="history-sample-heading">Số mẫu</th></tr></thead><tbody id="history-body"></tbody></table></div></article></section>
+<section id="page-images" class="page" hidden>
+ <div class="page-heading"><div><p class="eyebrow">QUAN SÁT & NHẬN DIỆN</p><h1>Camera trong vườn</h1><p class="subtitle">Xem ảnh, khung nhận diện và lịch sử xử lý.</p></div>
+  <div class="actions"><label class="button secondary upload-label" data-local-only>Tải ảnh lên<input id="image-upload" type="file" accept="image/png,image/jpeg,image/webp" hidden></label><button class="button" id="capture-button" type="button" data-dashboard-admin hidden><svg aria-hidden="true"><use href="#camera"/></svg>Chụp mô phỏng</button></div>
+ </div>
+ <div id="capture-feedback" class="info-box" hidden><p id="capture-status" role="status"></p><button id="capture-result" class="button secondary" type="button" hidden>Xem ảnh vừa chụp</button></div>
+ <div id="camera-note" class="info-box">Bộ nhận diện demo tìm các hình màu trong ảnh bẫy tổng hợp. Đây chưa phải model nhận diện sâu bệnh thực tế. Ảnh tải lên được lưu riêng và không được gán dự đoán giả.</div>
+ <article id="led-panel" class="card led-panel" hidden>
+  <div><h2>Đèn hỗ trợ camera</h2><p>LED IO12 · Trạm 01</p><p id="led-status" role="status" aria-live="polite">Đang kiểm tra kết nối điều khiển đèn…</p></div>
+  <div class="actions" data-dashboard-admin hidden><button id="led-on" type="button" class="button" disabled>Bật đèn</button><button id="led-off" type="button" class="button secondary" disabled>Tắt đèn</button><button id="led-refresh" type="button" class="button secondary">Kiểm tra lại</button></div>
+ </article>
+ <details id="ai-demo" class="card ai-demo" hidden>
+  <summary>Thử AI trên ảnh bẫy thật</summary>
+  <p>Bản thử phát hiện, đếm và phân biệt bọ phấn trắng với rệp đen. Chọn một ảnh mẫu rồi bấm phân tích.</p>
+  <div class="ai-controls">
+   <label for="ai-demo-sample">Ảnh mẫu</label>
+   <select id="ai-demo-sample" disabled><option>Đang chuẩn bị ảnh mẫu…</option></select>
+   <button class="button" type="button" data-ai-run disabled>Phân tích ảnh</button>
+   <button class="button secondary" id="ai-demo-retry" type="button" hidden>Tải lại ảnh mẫu</button>
+  </div>
+  <figure class="ai-photo" hidden><img alt=""><svg class="ai-overlay" aria-hidden="true" hidden></svg></figure>
+  <p id="ai-demo-reference" class="ai-reference" hidden></p>
+  <p class="ai-status" role="status"></p>
+  <div class="ai-result" hidden></div>
+  <p class="ai-credit">Ảnh cắt từ <a href="https://zenodo.org/records/7139220" target="_blank" rel="noopener">PestNu Yellow Glue Paper Traps</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a><span id="ai-demo-credit"></span></p>
+ </details>
+ <div class="filter-row"><span id="image-total"></span><select id="image-device" aria-label="Lọc camera" data-local-only><option value="">Tất cả trạm</option><option>station-001</option><option>station-002</option></select></div>
+ <div id="image-grid" class="image-grid"></div><div class="pagination"><button class="button secondary" id="image-prev">← Trước</button><span id="image-page"></span><button class="button secondary" id="image-next">Tiếp →</button></div>
+</section>
+<section id="page-alerts" class="page" hidden><div class="page-heading"><div><p class="eyebrow">CHỦ ĐỘNG THEO DÕI</p><h1>Cảnh báo trong vườn</h1><p class="subtitle">Ngưỡng demo có thời gian lấy trung bình và khoảng nghỉ chống lặp.</p></div><a class="button secondary" href="#settings" data-dashboard-admin>Thiết lập ngưỡng</a></div><div class="filter-row"><div class="segmented" id="alert-tabs"><button class="selected" data-state="all">Tất cả</button><button data-state="open">Chưa xử lý</button><button data-state="ack">Đã xác nhận</button></div><span id="alert-total"></span></div><div id="alert-list" class="card"></div><div class="pagination"><button class="button secondary" id="alert-prev">← Trước</button><span id="alert-page"></span><button class="button secondary" id="alert-next">Tiếp →</button></div></section>
+<section id="page-simulation" class="page" data-local-only hidden><div class="page-heading"><div><p class="eyebrow">KHÔNG CẦN PHẦN CỨNG</p><h1>Phòng mô phỏng</h1><p class="subtitle">Thay đổi điều kiện ngoài vườn, quan sát hệ thống phản hồi thật.</p></div><span class="tag">SIMULATION LAB</span></div><div class="two-columns"><article class="card"><div class="card-heading"><div><h2>Chọn một kịch bản</h2><p>Áp dụng cho hai trạm và camera tổng hợp</p></div></div><form id="simulation-form"><div class="scenarios"><label><input type="radio" name="scenario" value="normal"><span class="scenario-icon">☀</span><div><strong>Ngày bình thường</strong><p>28°C · Ẩm 72% · Đất 58%</p></div></label><label><input type="radio" name="scenario" value="hot-dry"><span class="scenario-icon orange">♨</span><div><strong>Nắng nóng, đất khô</strong><p>39°C · Ẩm 49% · Đất 17%</p></div></label><label><input type="radio" name="scenario" value="humid"><span class="scenario-icon blue">☂</span><div><strong>Độ ẩm tăng cao</strong><p>29°C · Ẩm 94% · Đất 78%</p></div></label><label><input type="radio" name="scenario" value="pests"><span class="scenario-icon purple">✳</span><div><strong>Nhiều sâu trong bẫy</strong><p>9 đối tượng trên mỗi ảnh tổng hợp</p></div></label></div><div class="form-grid"><label>Chu kỳ cảm biến (giây)<input name="interval_seconds" type="number" min="2" max="15" required></label><label>Chu kỳ camera (giây)<input name="camera_seconds" type="number" min="10" max="600" required></label></div><div class="check-row"><label><input name="running" type="checkbox"> Chạy mô phỏng liên tục</label></div><fieldset><legend>Giả lập trạm mất kết nối</legend><label><input name="offline" type="checkbox" value="station-001"> Trạm 01</label><label><input name="offline" type="checkbox" value="station-002"> Trạm 02</label></fieldset><button class="button full" type="submit">Áp dụng kịch bản <svg><use href="#arrow"/></svg></button><p class="form-note">Cảm biến phản hồi trong vài giây. Ngưỡng môi trường dùng trung bình 1 phút mặc định; camera dùng số đối tượng của từng ảnh.</p></form></article><div><article class="card flow-card"><p class="eyebrow">LUỒNG ĐANG CHẠY</p><h2>Từ trạm đến màn hình</h2><ol class="pipeline"><li><b>01</b><div><strong>Trạm ảo ESP32</strong><p>Nhiệt độ, độ ẩm, pin và tín hiệu</p></div></li><li><b>02</b><div><strong>MQTT qua TLS</strong><p>Broker thật · tài khoản riêng từng trạm</p></div></li><li><b>03</b><div><strong>Lưu trữ & kiểm tra ngưỡng</strong><p>TimescaleDB · hàng đợi · chống trùng</p></div></li><li><b>04</b><div><strong>Dashboard & thông báo</strong><p>WebSocket · lịch sử · xác nhận cảnh báo</p></div></li></ol><div class="info-box">Tạm dừng giữ nguyên dữ liệu. Mất kết nối sẽ được hiển thị ngay khi nhận trạng thái hoặc sau 20 giây không có mẫu mới.</div></article><article class="card capture-lab"><h2>Thử camera ngay</h2><p>Tạo ảnh có số đối tượng xác định để kiểm tra khung nhận diện và cảnh báo.</p><form id="capture-form"><label>Số đối tượng<input name="count" type="number" min="0" max="20" value="9" required></label><label>Trạm<select name="device_id"><option>station-001</option><option>station-002</option></select></label><button class="button secondary full">Tạo ảnh & xử lý</button></form></article></div></div></section>
+<section id="page-settings" class="page" hidden><div class="page-heading"><div><p class="eyebrow">ĐIỀU CHỈNH THEO NHU CẦU</p><h1>Thiết lập ngưỡng</h1><p class="subtitle">Thay đổi ngưỡng, cửa sổ thời gian và khoảng nghỉ cho từng luật.</p></div></div><div class="info-box">Các giá trị phục vụ thử nghiệm phần mềm, không phải kết luận nông học. Thông báo được gửi vào hộp thư cục bộ của ứng dụng.</div><div id="rule-forms" class="two-columns"></div></section>
+<section id="page-accounts" class="page" hidden>
+ <div class="page-heading"><div><p class="eyebrow">QUẢN LÝ TRUY CẬP</p><h1>Duyệt tài khoản</h1><p class="subtitle">Duyệt tài khoản mới để cho phép xem số đo, ảnh và cảnh báo trong vườn.</p></div><button class="button secondary" id="refresh-registrations" type="button">Làm mới</button></div>
+ <article class="card" aria-labelledby="registrations-heading">
+  <div class="card-heading"><div><h2 id="registrations-heading">Đăng ký đang chờ duyệt</h2><p>Hãy xác nhận tên đăng nhập với người đăng ký trước khi duyệt.</p></div></div>
+  <p id="registration-status" class="empty" role="status">Đang tải danh sách…</p>
+  <ul id="registration-rows" aria-labelledby="registrations-heading" hidden></ul>
+ </article>
+</section>
+<footer><span><svg><use href="#leaf"/></svg> PTIT Garden <span class="footer-divider">/</span> IoT & giám sát sâu bệnh</span><span><span id="data-source">Dữ liệu mô phỏng</span> · <span id="last-update">Đang kết nối…</span></span></footer>
+</main></div>
+<dialog id="image-dialog"><button class="dialog-close" aria-label="Đóng">×</button><div id="image-detail"></div></dialog>
+<dialog id="device-dialog"><button class="dialog-close" aria-label="Đóng">×</button><h2>Chỉnh sửa trạm</h2><form id="device-form"><input name="id" type="hidden"><label>Tên trạm<input name="name" maxlength="80" required></label><label>Vĩ độ<input name="latitude" type="number" step="any" min="-90" max="90" required></label><label>Kinh độ<input name="longitude" type="number" step="any" min="-180" max="180" required></label><label class="check-row"><input name="enabled" type="checkbox"> Cho phép nhận dữ liệu</label><button class="button full">Lưu thay đổi</button></form></dialog>
+<dialog id="notifications-dialog"><button class="dialog-close" aria-label="Đóng">×</button><h2>Hộp thư khu vườn</h2><p>Thông báo cục bộ từ các luật cảnh báo</p><button class="button secondary" id="read-all" data-dashboard-admin>Đánh dấu đã đọc</button><div id="notification-list"></div></dialog>
+<div id="toast" role="status" hidden></div>
+</body></html>

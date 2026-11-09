@@ -1,0 +1,10 @@
+{
+  "name": "RicePest-30",
+  "author": "kkb20334-lang",
+  "url": "https://github.com/kkb20334-lang/RicePest-30",
+  "commit": "206e0a990edb99efa75ca7beb9d5f1243c807c0d",
+  "license": "CC BY-NC 4.0",
+  "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+  "changes": "Resized demo photos. Public annotations merged for a generic insect detector; fine-tuned six-species model from user.",
+  "scope": "Research and teaching; no guaranteed detection of all insects."
+}

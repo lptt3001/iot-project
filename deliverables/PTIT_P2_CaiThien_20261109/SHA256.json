@@ -1,0 +1,23 @@
+{
+  "BAO_CAO.md": "f8bb9f2ddbf2fb4af848657b252e7cb4847bfe956ab5c6fc3a7e016c06a87348",
+  "comparison.png": "63616e0603f121fde96f1094ace5f02f86977711379c98c21ba1a9ea5786e1c7",
+  "example-1.jpg": "97a43ba9b85050160e6f0ccaafb4da085730491a791a7fac8adbd01b244d1322",
+  "example-2.jpg": "a7809f5598aced1cb1f8f60e086b866b06d25d947386c0b126ac492e94321c5a",
+  "example-3.jpg": "516b9a44c9cd2fc87498ec04aa982602c9b62c78989eb47023bda1d98c25f603",
+  "LICENSE-DATA.json": "4c0df552a0c6ac41addd38dd9da15522392106eb757818343c706ae6a13533ba",
+  "model.json": "aac400356ea30a74db635419e77a6f0503e92f954134c605cc8dec07c0ec6cb0",
+  "evaluation/comparison-per-image.csv": "c37e7fa1558318811cf107263e9ae128fb3de0df7aa539b973488c942f3dfb2f",
+  "evaluation/comparison.json": "c422c4a2356ec7ac1817029e0eadf85fffb20c7d120908d3f3c4c8aa649019a5",
+  "evaluation/dataset-audit.json": "5a42392fd6d33be5965ed53f8d2b9b1659c96dfbc0a7bd783b268e206dd3b181",
+  "evaluation/environment.json": "c0b756e85a1513f89cc7d8f69d34a493227e3623a53da25cbc87dcd8df030762",
+  "evaluation/onnx-parity.json": "8ff25df6156581a242bafe1df2a353f1c795e954ae651e2a936e2fda9fb640a9",
+  "evaluation/onnx-web-verification.json": "4962fe7b022ee19b90ddeeb0b16c230b1a8a1ce5fe4e183688c612a6002588f7",
+  "evaluation/selection-before-test.json": "6a1f17b0af4f8dbdaa1eebef7826e64c477de143ba2b0618671b9d9f1d2e16fe",
+  "evaluation/training-args.yaml": "90dda8ba3e287627015870fb2a85bb28816275a3f484ae286e5cee1116a400ed",
+  "evaluation/training-results.csv": "f151a77047a4364fed7a59ccd6693dae9eba48dc8469744131717401ed47c1eb",
+  "evaluation/transfer-audit.json": "873046ee6e3ec0c00840a9cb696847405a49904ec6456edf3be822b8aa3d99e1",
+  "licenses/Ultralytics-AGPL-3.0.txt": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+  "models/PTIT_InsectDetector_P2_CaiThien_v1.pt": "c286e3e82d8d4ad2c6bac7e6358ea93996f3636691e49c60c54fd6ad20ab0ff4",
+  "models/yolov8n-p2-preserved.yaml": "ca988f695394948daf9adde588230bbfdd94d087f0d261684c702f52a5088d67",
+  "onnx/model-56593aaff227.onnx": "56593aaff227d6a27907dedb7a89ca0eddb35a73fa026d0d92a3ec923bfe03e0"
+}

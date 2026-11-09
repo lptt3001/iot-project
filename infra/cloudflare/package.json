@@ -1,0 +1,5 @@
+{
+  "name": "ptit-garden-cloud",
+  "private": true,
+  "dependencies": { "@cloudflare/puppeteer": "1.1.0" }
+}

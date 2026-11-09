@@ -1,0 +1,25 @@
+{
+  "source": {
+    "credit": "kkb20334-lang · ảnh được thu nhỏ còn 640 × 485; không tạo ảnh bằng AI"
+  },
+  "samples": [
+    {
+      "id": "cn_01",
+      "title": "Bẫy có ngài cuốn lá",
+      "image": "/static/ai/demo/cn_01.jpg",
+      "reference_note": "Ảnh bẫy thật từ RicePest-30. Nhãn công khai chưa bao phủ mọi côn trùng nhỏ; cần kiểm tra lại số đếm."
+    },
+    {
+      "id": "pl_01",
+      "title": "Bẫy có ngài sâu tơ",
+      "image": "/static/ai/demo/pl_01.jpg",
+      "reference_note": "Ảnh bẫy thật từ RicePest-30. Nhãn công khai chưa bao phủ mọi côn trùng nhỏ; cần kiểm tra lại số đếm."
+    },
+    {
+      "id": "os_01",
+      "title": "Bẫy có ngài đục thân ngô",
+      "image": "/static/ai/demo/os_01.jpg",
+      "reference_note": "Ảnh bẫy thật từ RicePest-30. Nhãn công khai chưa bao phủ mọi côn trùng nhỏ; cần kiểm tra lại số đếm."
+    }
+  ]
+}

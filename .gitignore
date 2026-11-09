@@ -1,0 +1,42 @@
+.venv/
+.runtime/
+.secrets/
+node_modules/
+__pycache__/
+*.pyc
+.env
+.env.cloud
+firmware/ptit_cloud_camera/cloud_config.h
+infra/cloudflare/.dev.vars*
+.wrangler/
+infra/cloudflare/.build/
+infra/mosquitto/mosquitto.local.conf
+output/verification/*.log
+output/scratch/
+output/backups/
+
+# Private data and generated output never belong in the public repository.
+output/
+*.log
+*.pid
+*.sqlite
+*.sqlite3
+*.db
+*.zip
+*.bin
+*.key
+*.pfx
+*.p12
+.env.*
+!.env.example
+!.env.cloud.example
+**/cloud_config.h
+**/.pytest_cache/
+**/.ruff_cache/
+**/.mypy_cache/
+**/*.egg-info/
+/Báo cáo*.pdf
+
+# Downloaded datasets / imported experiments stay outside the source tree.
+/he_thong_nhan_dien_con_trung/
+/deliverables/AI_Nhap_*/

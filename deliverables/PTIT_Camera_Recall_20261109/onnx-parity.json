@@ -1,0 +1,11 @@
+{
+  "onnx": "C:\\Users\\Admin\\AppData\\Local\\PTIT-Garden-AI\\camera-recall-20261109\\runs\\camera\\weights\\best.onnx",
+  "sha256": "03244ece87370b4b4f09c7950a5e8128aa1e0681ff3956d9d034e90de037c0e4",
+  "shape": [
+    1,
+    5,
+    34000
+  ],
+  "pytorch_onnx_score_max_abs_error": 1.6987323760986328e-06,
+  "max_score": 0.7132444977760315
+}

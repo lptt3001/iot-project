@@ -1,0 +1,14 @@
+.venv
+.runtime
+.secrets
+.env
+.env.cloud
+firmware/ptit_cloud_camera/cloud_config.h
+.git
+output
+deliverables
+.wrangler
+**/.wrangler
+docs
+*.zip
+**/__pycache__

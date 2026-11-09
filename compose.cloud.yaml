@@ -1,0 +1,31 @@
+services:
+  app:
+    environment:
+      GARDEN_PUBLIC_HOST: ${GARDEN_PUBLIC_HOST:?Set a hostname in the cloud environment file}
+      GARDEN_DEVICE_HTTP_ENABLED: '1'
+    ports: !reset []
+  database:
+    ports: !reset []
+  mosquitto:
+    ports: !reset []
+  proxy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    environment:
+      GARDEN_PUBLIC_HOST: ${GARDEN_PUBLIC_HOST:?Set a hostname in the cloud environment file}
+      GARDEN_ADMIN_USER: ${GARDEN_ADMIN_USER:?Set a dashboard username}
+      GARDEN_ADMIN_HASH: ${GARDEN_ADMIN_HASH:?Set a dashboard password hash}
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [iot]
+volumes:
+  caddy_data:
+  caddy_config:

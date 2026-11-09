@@ -1,0 +1,91 @@
+{
+  "old_test": {
+    "threshold": 0.525,
+    "tp": 332,
+    "fp": 236,
+    "fn": 2113,
+    "truth": 2445,
+    "predicted": 568,
+    "absolute_count_error": 1881,
+    "precision": 0.5845070422535211,
+    "recall": 0.1357873210633947,
+    "f1": 0.22037836043810155,
+    "count_mae": 9.548223350253807,
+    "f2": 0.16041747197526093,
+    "f3": 0.1470783679617242
+  },
+  "new_test": {
+    "threshold": 0.075,
+    "tp": 1949,
+    "fp": 7037,
+    "fn": 496,
+    "truth": 2445,
+    "predicted": 8986,
+    "absolute_count_error": 6543,
+    "precision": 0.2168929445804585,
+    "recall": 0.7971370143149284,
+    "f1": 0.34100253696089583,
+    "count_mae": 33.213197969543145,
+    "f2": 0.5192902056911435,
+    "f3": 0.6288922590429479
+  },
+  "validation": {
+    "baseline": {
+      "threshold": 0.075,
+      "tp": 513,
+      "fp": 930,
+      "fn": 661,
+      "truth": 1174,
+      "predicted": 1443,
+      "absolute_count_error": 555,
+      "precision": 0.35550935550935553,
+      "recall": 0.43696763202725725,
+      "f1": 0.39205196790217806,
+      "count_mae": 5.842105263157895,
+      "f2": 0.41782049193679754,
+      "f3": 0.42717961528853365
+    },
+    "candidate": {
+      "threshold": 0.075,
+      "tp": 731,
+      "fp": 2655,
+      "fn": 443,
+      "truth": 1174,
+      "predicted": 3386,
+      "absolute_count_error": 2238,
+      "precision": 0.215888954518606,
+      "recall": 0.6226575809199318,
+      "f1": 0.3206140350877193,
+      "count_mae": 23.557894736842105,
+      "f2": 0.45223954466716154,
+      "f3": 0.5239392201834862
+    }
+  },
+  "scope": "Generic detector on synthetic camera-degraded source photos, full + 320 tiles and global NMS .45, before species fusion. Reused source split, not new field accuracy.",
+  "photo_counts": [
+    {
+      "id": "camera_1",
+      "old_at_0525": 0,
+      "baseline_at_new_threshold": 7,
+      "total_count": 20
+    },
+    {
+      "id": "camera_2",
+      "old_at_0525": 0,
+      "baseline_at_new_threshold": 6,
+      "total_count": 23
+    },
+    {
+      "id": "camera_3",
+      "old_at_0525": 0,
+      "baseline_at_new_threshold": 7,
+      "total_count": 25
+    },
+    {
+      "id": "camera_4",
+      "old_at_0525": 0,
+      "baseline_at_new_threshold": 8,
+      "total_count": 16
+    }
+  ]
+}
