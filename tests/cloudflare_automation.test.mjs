@@ -166,7 +166,8 @@ test('malformed results and low-confidence species cannot create pest alerts',()
  assert.equal(sensitive.unknown_count,1,'sensitive generic insect detections remain valid without inventing a species');
  assert.equal(sensitive.identified_count,0);
  assert.throws(()=>validateResult(result([{...identified,pest_code:'made-up'}])));
- assert.throws(()=>validateResult(result([{...identified,confidence:.6}])));
+ assert.throws(()=>validateResult(result([{...identified,confidence:.499}])));
+ assert.equal(validateResult(result([{...identified,confidence:.5}])).identified_count,1);
  assert.throws(()=>validateResult(result([{...identified,x_max:NaN}])));
  assert.throws(()=>validateResult(result([{...identified,identification_status:'unknown'}])));
 });

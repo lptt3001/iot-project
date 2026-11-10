@@ -18,7 +18,9 @@ async function models(){
   const validFile=value=>typeof value==='string'&&/^model-[a-f0-9]{12}\.onnx$/.test(value);
   if(!validFile(config.insect_model)||!validFile(config.species_model)||
     !Number.isFinite(config.insect_threshold)||config.insect_threshold<.05||config.insect_threshold>.95||
-    config.species_threshold!==.7||config.classes?.join('|')!==Core.classes.join('|')){
+    !Number.isFinite(config.species_threshold)||config.species_threshold<.5||config.species_threshold>.95||
+    !Number.isFinite(config.species_margin)||config.species_margin<.1||config.species_margin>1||
+    config.classes?.join('|')!==Core.classes.join('|')){
     throw new InferenceError('Cấu hình AI không hợp lệ.');
   }
   importScripts(new URL('ort.wasm.min.js',ORT_ROOT).href);
@@ -88,12 +90,12 @@ self.addEventListener('message',async({data})=>{
         const tensor=new self.ort.Tensor('float32',transform.input,[1,3,640,640]);let output;
         try{
           const session=sessions[index],outputs=await session.run({[session.inputNames[0]]:tensor});output=outputs[session.outputNames[0]];
-          sets[index].push(...Core.decode(output,tile,transform,index===0?1:6,index===0?config.insect_threshold:.7,image.bitmap));
+          sets[index].push(...Core.decode(output,tile,transform,index===0?1:6,index===0?config.insect_threshold:config.species_threshold,image.bitmap));
         }finally{output?.dispose();tensor.dispose();}
         completed++;
       }
     }
-    const result=Core.fuse(sets[0],sets[1],image.bitmap.width,image.bitmap.height,{speciesThreshold:.7,margin:.15});
+    const result=Core.fuse(sets[0],sets[1],image.bitmap.width,image.bitmap.height,{speciesThreshold:config.species_threshold,margin:config.species_margin});
     self.postMessage({id,type:'result',...image.original,...result,model_version:config.model_version,
       detection_profile:config.detection_profile??'balanced',insect_threshold:config.insect_threshold,
       resized:image.original.width!==image.bitmap.width||image.original.height!==image.bitmap.height});

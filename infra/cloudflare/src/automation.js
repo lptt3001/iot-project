@@ -91,7 +91,7 @@ export function validateResult(result) {
       !['unknown','identified'].includes(d.identification_status)||
       (d.identification_status==='identified')!==(d.pest_code!=='unknown')||
       !['confidence','x_min','y_min','x_max','y_max'].every(k=>Number.isFinite(d[k])&&d[k]>=0&&d[k]<=1)||
-      d.x_min>=d.x_max||d.y_min>=d.y_max||d.pest_code!=='unknown'&&d.confidence<.7)throw Error('Invalid AI detection');
+      d.x_min>=d.x_max||d.y_min>=d.y_max||d.pest_code!=='unknown'&&d.confidence<.5)throw Error('Invalid AI detection');
   }
   return {width:result.width,height:result.height,model_version:result.model_version,
     resized:Boolean(result.resized),truncated:Boolean(result.truncated),

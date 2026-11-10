@@ -1,5 +1,5 @@
 {
-  "model_version": "ptit-insects-p2-camera-recall-20261109-v2",
+  "model_version": "ptit-insects-p2-camera-recall-20261110-v3",
   "classes": [
     "Cnaphalocrocis_medinalis",
     "Plutella_xylostella",
@@ -13,8 +13,8 @@
   "insect_threshold": 0.075,
   "species_model": "model-ca8b834e8d52.onnx",
   "species_sha256": "ca8b834e8d52f62a0e8ef54b50a5d3449136ae41e13b3418de54a5ca6b1ccca1",
-  "species_threshold": 0.7,
-  "species_margin": 0.15,
+  "species_threshold": 0.5,
+  "species_margin": 0.1,
   "input": "RGB float32 /255; 640 square letterbox114; full+320 tiles; NMS.45",
   "limitations": "Recall-first experimental operating point. Substantial false positives, including screen borders/icons in rephotographs. Counts are model predictions, not verified insects; no pathogen diagnosis.",
   "training_data": {

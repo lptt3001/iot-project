@@ -101,6 +101,8 @@ Trong **Camera & nhận diện**, ảnh camera đã phân tích lưu kết quả
 
 Bản web hiện dùng YOLOv8 P2 phát hiện côn trùng + model sáu loài, chạy bằng ONNX Runtime Web. Các kết quả là gợi ý cần đối chiếu thực địa. Các script `*pestnu*` và dữ liệu thử bọ phấn/rệp thuộc thí nghiệm trước; không phải model đang phục vụ trên web.
 
+**Ngưỡng gợi ý loài cập nhật 10/11/2026 (v3):** điểm loài từ 0,50 và chênh lệch với loài đứng thứ hai từ 0,10 (trước đây 0,70/0,15). Ngưỡng phát hiện côn trùng giữ 0,075. Đây là điều chỉnh tăng độ nhạy theo yêu cầu, chưa được đánh giá lại độ chính xác thực địa; có thể gọi nhầm tên loài nhiều hơn. Bấm **Phân tích lại** để áp dụng cho ảnh đã lưu.
+
 Model YOLOv8 sáu loài có bộ chạy Python riêng trong `scripts/run_trap_inference.py`. Tạo môi trường AI riêng, cài `requirements-trap-ai.txt`, rồi chạy:
 
 ~~~powershell

@@ -45,7 +45,7 @@ test('foreign/expired lease, wrong model, forged dimensions and weak named speci
  const f=fixture();try{
   const id=f.seed(),other=f.seed(),claim=await claimPhotoAnalysis(f.env,id);
   await assert.rejects(completePhotoAnalysis(f.env,other,{lease_token:claim.lease_token,result:result()},admin),{status:409});
-  for(const change of [{model_version:'old-p2'},{width:1280},{detections:[{...insect,pest_code:'Plutella_xylostella',identification_status:'identified',confidence:.6}]}])
+  for(const change of [{model_version:'old-p2'},{width:1280},{detections:[{...insect,pest_code:'Plutella_xylostella',identification_status:'identified',confidence:.499}]}])
    await assert.rejects(completePhotoAnalysis(f.env,id,{lease_token:claim.lease_token,result:result(change)},admin),{status:422});
   f.sql.prepare('UPDATE image_analysis SET next_attempt_at=0 WHERE image_id=?').run(id);
   await assert.rejects(completePhotoAnalysis(f.env,id,{lease_token:claim.lease_token,result:result()},admin),{status:409});
